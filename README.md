@@ -38,6 +38,7 @@ Step 3 (Skip if you are already working on an existing branch)
 
 Step 4
 
+- Make sure you are on the correct branch.
 - Start server in development mode with `npm run dev`.
 - Work.
 - Add all your work to the staging area with `git add .`.
