@@ -25,7 +25,7 @@ Step 3
 
 Step 1
 
-- Get the latest updates by pulling from origin with `git pull origin main`.
+- Get the latest updates with `git pull origin main`.
 
 Step 2
 
