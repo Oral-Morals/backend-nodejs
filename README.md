@@ -33,7 +33,7 @@ Step 2
 
 Step 3 (Skip if you are already working on an existing branch)
 
-- Create a new branch for all new work and editing existing work with `git checkout -b branch-name-here`.
+- Create a new branch for all new work with `git checkout -b branch-name-here`.
 - This git command will create a new branch and simultaneously switch to it.
 
 Step 4
