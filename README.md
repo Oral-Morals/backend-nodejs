@@ -51,7 +51,7 @@ Step 5
 
 Step 6
 
-- Push your code to upstream with `git push origin -u branch_name`.
+- Push your code to upstream with `git push origin branch_name`.
 - Now you can proceed to github to create a _pull request_ to the _main_ branch.
 - Your pull request will be merged once it is verified not to have conflicts.
 - _Please do not push directly to the main branch_
