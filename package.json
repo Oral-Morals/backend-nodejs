@@ -1,0 +1,21 @@
+{
+  "name": "oral-morals",
+  "version": "1.0.0",
+  "description": "Share and celebrate the values, humour, and words of wisdom that are unique to our respective communities.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Oral-Morals/backend-nodejs.git"
+  },
+  "author": "Hope, Nathan, Rick",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Oral-Morals/backend-nodejs/issues"
+  },
+  "homepage": "https://github.com/Oral-Morals/backend-nodejs#readme"
+}
