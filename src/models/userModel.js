@@ -36,8 +36,9 @@ const UserSchema = new mongoose.Schema({
     default:[]
   },
   isAdmin:{
-    type: Boolean,
-    default: false,
+    type: String,
+    enum: ["curator", "admin", "user"],
+    default: "user",
   },
   desc:{
     type: String,
