@@ -69,4 +69,4 @@ Remove a file from the staging area:
 
 DS_Store file showing up:
 
-- Stop using Finder.
+- Stop using Finder. 🙄
