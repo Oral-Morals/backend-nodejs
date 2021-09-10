@@ -3,6 +3,6 @@ const { check } = require('express-validator');
 const router = express.Router();
 const Auth = require('../controllers/authControllers.js');
 
-router.post('/register', Auth.registration);
+router.post('/signup', Auth.signup);
 
 module.exports = router;
