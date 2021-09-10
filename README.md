@@ -4,10 +4,6 @@ Thanks for the template seyiogunjuyigbe.
 
 ## Setup
 
-Step 0
-
-- Rick don't push to main anymore lol.
-
 Step 1
 
 - Clone this repository: `git clone https://github.com/Oral-Morals/backend-nodejs.git`
@@ -66,7 +62,3 @@ Module not installed:
 Remove a file from the staging area:
 
 - `git restore file-name`
-
-DS_Store file showing up:
-
-- Stop using Finder. 🙄
