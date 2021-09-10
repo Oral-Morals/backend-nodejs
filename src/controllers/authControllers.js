@@ -27,12 +27,12 @@ exports.signup = async (req, res) => {
     const user_ = await newUser.create(newUser, hashedPassword);
 
     //Create Token
-    const token = await TokenModel.create({
-      userID: user_.id,
-      token: uuidv4(),
-      expiresIn: moment().add(1, 'hours'),
-      tokenType: 'email-verification'
-    })
+    // const token = await TokenModel.create({
+    //   userID: user_.id,
+    //   token: uuidv4(),
+    //   expiresIn: moment().add(1, 'hours'),
+    //   tokenType: 'email-verification'
+    // })
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
