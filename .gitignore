@@ -1,5 +1,4 @@
 node_modules
-.DS_Store
 
 # Logs
 
@@ -126,6 +125,9 @@ package-lock.json
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.\*
-.idea/
 
-.vscode/
+# Project
+
+.DS_Store
+.idea/
+.vscode
