@@ -1,6 +1,4 @@
 node_modules
-.DS_Store
-.env
 
 # Logs
 
@@ -130,5 +128,6 @@ package-lock.json
 
 # Project
 
+.DS_Store
 .idea/
 .vscode
