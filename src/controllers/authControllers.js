@@ -7,8 +7,6 @@ const jwt = require("jsonwebtoken");
 //@access Public
 exports.signup = async (req, res) => {
   try {
-    console.log(typeof process.env.SALT);
-
     // Search for existing user email
     const user = await User.findOne({ email: req.body.email });
     if (user)
