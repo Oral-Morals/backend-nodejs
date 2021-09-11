@@ -1,9 +1,5 @@
-const User = require('../models/user');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-
-
-
+const User = require("../models/userModel");
+const bcrypt = require("bcryptjs");
 
 //@route POST '/signup'
 //@desc Register/Signup a new user
@@ -13,9 +9,9 @@ exports.signup = async (req, res) => {
     // Search for existing user email
     const user = User.findOne({ email: req.body.email });
     if (user)
-      return res
-        .status(401)
-        .json({ message: "The email address you have entered is already associated with another account"});
+      return res.status(401).json({
+        message: "The email address you have entered is already associated with another account",
+      });
 
     // If no user exists, save newly created user
     const newUser = new User({ ...req.body });
