@@ -14,11 +14,11 @@ exports.signup = async (req, res) => {
         message: "The email address you have entered is already associated with another account",
       });
 
-    // Generate salt and hash password
+    // If no user exists, generate salt and hash password
     // const salt = await bcrypt.genSalt(process.env.SALT);
     const hashedPassword = await bcrypt.hash(req.body.password, parseInt(process.env.SALT));
 
-    // If no user exists, create new user
+    // Create new user
     const newUser = await User.create({
       username: req.body.username,
       email: req.body.email,
