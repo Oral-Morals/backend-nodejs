@@ -1,12 +1,25 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const moment = require("moment");
+
+moment().format();
 
 //@route POST '/signup'
 //@desc Register/Signup a new user
 //@access Public
 exports.signup = async (req, res) => {
   try {
+    // Check if the user's age is under 18 years old
+
+    const userDOB = moment(req.body.dateOfBirth);
+    const earliestDOB = moment().subtract(18, "years");
+
+    // If the user's DOB is after the earliest DOB to be 18 years old today,
+    // the user is younger than 18 years old.
+    if (userDOB.isAfter(earliestDOB))
+      return res.status(403).json({ message: "User must be 18 or older to use app." });
+
     // Search for existing user email
     const user = await User.findOne({ email: req.body.email });
     if (user)
@@ -15,27 +28,23 @@ exports.signup = async (req, res) => {
       });
 
     // If no user exists, generate salt and hash password
-    // const salt = await bcrypt.genSalt(process.env.SALT);
     const hashedPassword = await bcrypt.hash(req.body.password, parseInt(process.env.SALT));
 
     // Create new user
     const newUser = await User.create({
-      username: req.body.username,
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
       email: req.body.email,
-      profilePicture: req.body.profilePicture,
       password: hashedPassword,
-      followers: req.body.followers,
-      following: req.body.following,
-      role: req.body.role,
-      country: req.body.country,
-      ethnicity: req.body.ethnicity,
-      language: req.body.language,
+      dateOfBirth: req.body.dateOfBirth,
+      username: req.body.email,
     });
 
     await newUser.save();
 
     //Create Token
     const token = await jwt.sign({ newUser }, process.env.JWT_SECRET);
+
     return res.status(201).json({ message: "New User Created", token });
   } catch (error) {
     console.log(error);

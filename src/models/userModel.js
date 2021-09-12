@@ -11,12 +11,11 @@ const UserSchema = new mongoose.Schema(
       required: true,
     },
     dateOfBirth: {
-      type: Number,
+      type: Date,
       required: true,
     },
     username: {
       type: String,
-      required: true,
       min: 3,
       max: 20,
       unique: true,
@@ -34,7 +33,7 @@ const UserSchema = new mongoose.Schema(
     },
     profilePicture: {
       type: String,
-      default: "",
+      default: null,
     },
     followers: {
       type: Array,
@@ -52,12 +51,15 @@ const UserSchema = new mongoose.Schema(
     country: {
       type: String,
       max: 50,
+      default: null,
     },
     ethnicity: {
       type: String,
+      default: null,
     },
     language: {
       type: String,
+      default: null,
     },
   },
   { timestamps: true }

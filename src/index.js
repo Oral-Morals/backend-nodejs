@@ -1,9 +1,9 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 3000;
-const authRoutes = require('./routes/authRoutes.js')
+const authRoutes = require("./routes/authRoutes.js");
 //==================================================
 // MIDDLEWARE
 //==================================================
@@ -20,12 +20,12 @@ dbSetup();
 //==================================================
 // ROUTES
 //==================================================
-app.use(authRoutes);
+app.use("/auth", authRoutes);
 
 //==================================================
 // SEEDERS
 //==================================================
-const { seedCountries } = require('./seeders/countrySeeder');
+const { seedCountries } = require("./seeders/countrySeeder");
 
 // seedCountries();
 //==================================================
@@ -33,4 +33,4 @@ const { seedCountries } = require('./seeders/countrySeeder');
 //==================================================
 app.listen(port, () => {
   console.log(`Server is listening on port: ${port}`);
-})
+});
