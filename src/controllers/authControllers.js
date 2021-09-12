@@ -42,3 +42,21 @@ exports.signup = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+//@route POST '/signup'
+//@desc Register/Signup a new user
+//@access Public
+exports.login = async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    if (!user)
+      return res.status(404).json({
+        message: "User does not exist",
+      });
+
+    // If user
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
