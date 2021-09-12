@@ -46,7 +46,6 @@ exports.signup = async (req, res) => {
     const token = await jwt.sign({ newUser }, process.env.JWT_SECRET);
 
     return res.status(201).json({ message: "New User Created", token });
-    return res.status(201).json({ message: "New User Created" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, message: error.message });
