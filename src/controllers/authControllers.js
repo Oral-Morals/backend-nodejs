@@ -20,8 +20,11 @@ exports.signup = async (req, res) => {
 
     // Create new user
     const newUser = await User.create({
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
       username: req.body.username,
       email: req.body.email,
+      dateOfBirth: req.body.dateOfBirth,
       profilePicture: req.body.profilePicture,
       password: hashedPassword,
       followers: req.body.followers,
@@ -48,13 +51,24 @@ exports.signup = async (req, res) => {
 //@access Public
 exports.login = async (req, res) => {
   try {
-    const user = await User.findOne({ email: req.body.email });
+    const { email, password } = await req.body;
+    // Search for existing user by email
+    const user = await User.findOne({ email });
     if (!user)
-      return res.status(404).json({
-        message: "User does not exist",
+      return res.status(401).json({
+        message:
+          "The email " +
+          email +
+          " is not associated with any account. Double-check your email and try again.",
       });
-
-    // If user
+    console.log("This is the user: " + user);
+    // If existing user is found, compare passwords
+    const match = await bcrypt.compare(password, user.password);
+    console.log("This is the match: " + match);
+    if (!match) return res.status(400).json({ message: "Incorrect Email or Password" });
+    // Auto saves session data in mongo store
+    // Sends cookie with sessionID automatically in response
+    return res.status(200).json({ message: "You are now logged in!" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, message: error.message });
