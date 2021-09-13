@@ -61,13 +61,9 @@ exports.login = async (req, res) => {
           email +
           " is not associated with any account. Double-check your email and try again.",
       });
-    console.log("This is the user: " + user);
-    // If existing user is found, compare passwords
+    // If existing user is found, compare passwords and log in the user
     const match = await bcrypt.compare(password, user.password);
-    console.log("This is the match: " + match);
     if (!match) return res.status(400).json({ message: "Incorrect Email or Password" });
-    // Auto saves session data in mongo store
-    // Sends cookie with sessionID automatically in response
     return res.status(200).json({ message: "You are now logged in!" });
   } catch (error) {
     console.log(error);
