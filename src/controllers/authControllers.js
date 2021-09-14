@@ -10,16 +10,6 @@ moment().format();
 //@access Public
 exports.signup = async (req, res) => {
   try {
-    // Check if the user's age is under 18 years old
-
-    const userDOB = moment(req.body.dateOfBirth);
-    const earliestDOB = moment().subtract(18, "years");
-
-    // If the user's DOB is after the earliest DOB to be 18 years old today,
-    // the user is younger than 18 years old.
-    if (userDOB.isAfter(earliestDOB))
-      return res.status(403).json({ message: "User must be 18 or older to use app." });
-
     // Search for existing user email
     const user = await User.findOne({ email: req.body.email });
     if (user)
@@ -32,18 +22,16 @@ exports.signup = async (req, res) => {
 
     // Create new user
     const newUser = await User.create({
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
       email: req.body.email,
       password: hashedPassword,
       dateOfBirth: req.body.dateOfBirth,
-      username: req.body.email,
+      username: req.body.username,
     });
 
     await newUser.save();
 
     //Create Token
-    const token = await jwt.sign({ newUser }, process.env.JWT_SECRET);
+    const token = jwt.sign({ newUser }, process.env.JWT_SECRET);
 
     return res.status(201).json({ message: "New User Created", token });
   } catch (error) {
