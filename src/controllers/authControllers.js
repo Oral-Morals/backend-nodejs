@@ -5,6 +5,30 @@ const moment = require("moment");
 
 moment().format();
 
+exports.authorizeAge = async (req, res, next) => {
+  try {
+    // Check if the user's age is under 18 years old
+
+    const userDOB = moment(req.body.dateOfBirth);
+    const earliestDOB = moment().subtract(18, "years");
+
+    // If the user's DOB is after the earliest DOB to be 18 years old today,
+    // the user is younger than 18 years old.
+    if (userDOB.isAfter(earliestDOB)) {
+      return res.status(403).json({ success: false, message: "User must be 18 or older to use app." });
+    }
+
+    // If the user's DOB is valid, the response is 200 and DOB is sent back to be used in the registration flow.
+    if (!userDOB.isAfter(earliestDOB)) return res.status(200).json({ success: true, data: { dateOfBirth: userDOB } });
+
+    // Go to next available middleware.
+    next();
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 //@route POST '/signup'
 //@desc Register/Signup a new user
 //@access Public
@@ -52,30 +76,6 @@ exports.login = async (req, res) => {
       });
 
     // If user
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-exports.authorizeAge = async (req, res, next) => {
-  try {
-    // Check if the user's age is under 18 years old
-
-    const userDOB = moment(req.body.dateOfBirth);
-    const earliestDOB = moment().subtract(18, "years");
-
-    // If the user's DOB is after the earliest DOB to be 18 years old today,
-    // the user is younger than 18 years old.
-    if (userDOB.isAfter(earliestDOB)) {
-      return res.status(403).json({ success: false, message: "User must be 18 or older to use app." });
-    }
-
-    // If the user's DOB is valid, the response is 200 and DOB is sent back to be used in the registration flow.
-    if (!userDOB.isAfter(earliestDOB)) return res.status(200).json({ success: true, data: { dateOfBirth: userDOB } });
-
-    // Go to next available middleware.
-    next();
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, message: error.message });
