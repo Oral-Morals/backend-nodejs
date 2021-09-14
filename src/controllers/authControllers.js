@@ -49,15 +49,19 @@ exports.signup = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = await req.body;
+
     // Search for existing user by email
     const user = await User.findOne({ email });
     if (!user)
       return res.status(401).json({
         message: "The email " + email + " is not associated with any account. Double-check your email and try again.",
       });
-    // If existing user is found, compare passwords and log in the user
+
+    // If existing user is found, compare passwords
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(400).json({ message: "Incorrect Email or Password" });
+
+    // If passwords match, log in the user
     return res.status(200).json({ message: "You are now logged in!" });
   } catch (error) {
     console.log(error);
