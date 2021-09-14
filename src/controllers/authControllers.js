@@ -10,16 +10,6 @@ moment().format();
 //@access Public
 exports.signup = async (req, res) => {
   try {
-    // Check if the user's age is under 18 years old
-
-    const userDOB = moment(req.body.dateOfBirth);
-    const earliestDOB = moment().subtract(18, "years");
-
-    // If the user's DOB is after the earliest DOB to be 18 years old today,
-    // the user is younger than 18 years old.
-    if (userDOB.isAfter(earliestDOB))
-      return res.status(403).json({ message: "User must be 18 or older to use app." });
-
     // Search for existing user email
     const user = await User.findOne({ email: req.body.email });
     if (user)
@@ -39,14 +29,12 @@ exports.signup = async (req, res) => {
       dateOfBirth: req.body.dateOfBirth,
       profilePicture: req.body.profilePicture,
       password: hashedPassword,
-      dateOfBirth: req.body.dateOfBirth,
-      username: req.body.email,
     });
 
     await newUser.save();
 
     //Create Token
-    const token = await jwt.sign({ newUser }, process.env.JWT_SECRET);
+    const token = jwt.sign({ newUser }, process.env.JWT_SECRET);
 
     return res.status(201).json({ message: "New User Created", token });
   } catch (error) {
@@ -65,10 +53,7 @@ exports.login = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user)
       return res.status(401).json({
-        message:
-          "The email " +
-          email +
-          " is not associated with any account. Double-check your email and try again.",
+        message: "The email " + email + " is not associated with any account. Double-check your email and try again.",
       });
     // If existing user is found, compare passwords and log in the user
     const match = await bcrypt.compare(password, user.password);
