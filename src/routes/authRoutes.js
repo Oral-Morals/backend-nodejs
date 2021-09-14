@@ -2,9 +2,8 @@ const express = require("express");
 // const { check } = require('express-validator');
 const router = express.Router();
 const Auth = require("../controllers/authControllers.js");
-const Authorization = require("../middleware/authorization");
 
-router.post("/eligibility/age", Authorization.age);
+router.post("/eligibility/age", Auth.authorizeAge);
 
 router.post("/signup", Auth.signup);
 
