@@ -189,6 +189,32 @@ exports.resendEmailVerToken = async (req, res) => {
   }
 };
 
+exports.passwordResetRequest = async (req, res) => {
+  try {
+    let user = await User.findOne({ email: req.body.email });
+
+    let token = await TokenModel.create({
+      userID: user._id,
+      token: uuidv4(),
+      expiresIn: moment().add(1, "hours"),
+      tokenType: "password-reset",
+    });
+
+    const to = user.email;
+    const subject = "Fogot your password?";
+    const html = `<p>Click <a href=""reset-form-with-token>here</a> to reset your password.</p>`;
+
+    sendEmail(to, subject, html);
+
+    return res
+      .status(200)
+      .json({ message: `An email has been sent to ${user.email} with further instructions.`, token: token.token });
+  } catch (err) {
+    console.log(err);
+    if (err) return res.status(500).json({ message: "Something went wrong. Please try again later" });
+  }
+};
+
 exports.passwordReset = async (req, res) => {
   try {
     let token = await TokenModel.findOne({ token: req.body.token });
@@ -210,25 +236,30 @@ exports.passwordReset = async (req, res) => {
       return res
         .status(401)
         .json({ message: "Token may be expired. If you can't login, please request another token." });
-
-      let user = await User.findOne({ _id: token.userID });
-
-      if (!user) return res.status(500).json({message: "Something went wrong. Please try again later"});
-
-      token.expired = true;
-      await token.save();
-
-      let hashedPassword = bcrypt.hashSync(req.body.newPassword, parseInt(process.env.SALT));
-
-      user.password = hashedPassword;
-
-      await user.save();
-
-      await TokenModel.updateMany({userID: user._id}, {expired: true});
-
-      const to = user.email;
-      const
     }
+
+    let user = await User.findOne({ _id: token.userID });
+
+    if (!user) return res.status(500).json({ message: "Something went wrong. Please try again later" });
+
+    token.expired = true;
+    await token.save();
+
+    let hashedPassword = bcrypt.hashSync(req.body.newPassword, parseInt(process.env.SALT));
+
+    user.password = hashedPassword;
+
+    await user.save();
+
+    await TokenModel.updateMany({ userID: user._id }, { expired: true });
+
+    const to = user.email;
+    const subject = "Password updated";
+    const html = `<p>Your password has been updated. Please login.</p>`;
+
+    sendEmail(to, subject, html);
+
+    res.status(200).json({ message: "Password updated. Please login." });
   } catch (err) {
     console.log(err);
     if (err) return res.status(500).json({ message: "Something went wrong. Please try again later" });
