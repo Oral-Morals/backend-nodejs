@@ -1,13 +1,16 @@
 const multer = require("multer");
 const path = require("path");
 
-// Multer config
+// Multer Storage Engine config
 // Enable disk storage so files can be saved to this project.
 const storage = multer.diskStorage({
   destination: "./src/uploads/",
+
   filename: function (req, file, cb) {
     console.log(file);
+
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+
     cb(null, file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname));
   },
 });
@@ -27,3 +30,4 @@ module.exports.multipleMedia = multer({ storage: storage }).fields([
 // TODO
 // Max files of which type?
 // Max size of each file type?
+// Architecture of routes and controllers for profile picture and posts
