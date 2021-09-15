@@ -2,7 +2,9 @@ const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const moment = require("moment");
-
+const { TokenModel } = require("../models/tokens");
+const { v4: uuidv4 } = require("uuid");
+// const sendEmail = require("../services/emailService");
 moment().format();
 
 //@route POST '/signup'
@@ -11,7 +13,7 @@ moment().format();
 exports.signup = async (req, res) => {
   try {
     // Search for existing user email
-    const user = await User.findOne({ email: req.body.email });
+    const user = await User.findOne({ email: req.body.email } || { username: req.body.username });
     if (user)
       return res.status(401).json({
         message: "The email address you have entered is already associated with another account",
@@ -106,7 +108,7 @@ exports.authorizeUser = async (req, res, next) => {
     let token = req.headers.authorization.replace("Bearer ", "");
 
     // Returns the payload if the signature is valid.
-    jwt.verify(token, secret, (error, decodedToken) => {
+    jwt.verify(token, process.env.JWT_SECRET, (error, decodedToken) => {
       if (error) return res.status(500).json({ error });
 
       // Check for invalid token.
@@ -119,7 +121,116 @@ exports.authorizeUser = async (req, res, next) => {
       next();
     });
   } catch (error) {
-    console.log(err);
+    console.log(error);
     res.status(500).json({ message: "Server error. Possible error with token." });
+  }
+};
+
+exports.emailVerification = async (req, res) => {
+  try {
+    let token = await TokenModel.findOne({ token: req.params.token });
+
+    if (token.expired)
+      return res
+        .status(401)
+        .json({ message: "Token may be expired. If you can't login, please request another token." });
+
+    if (moment(token.expiresIn) < moment()) {
+      token.expired = true;
+      await token.save();
+
+      return res
+        .status(401)
+        .json({ message: "Token may be expired. If you can't login, please request another token." });
+    }
+
+    let user = await User.findOne({ _id: token.userID });
+
+    if (!user) return res.status(400).json({ message: "This account is already verified. Please log in" });
+
+    user.emailVerified = true;
+    await user.save();
+
+    await TokenModel.updateMany({ userID: user._id }, { expired: true });
+
+    return res.status(200).json({ message: "Your account has been verified! Please log in." });
+  } catch (err) {
+    console.log(err);
+    if (err) return res.status(500).json({ message: "Something went wrong. Please try again later" });
+  }
+};
+
+exports.resendEmailVerToken = async (req, res) => {
+  try {
+    let user = await User.findOne({ email: req.body.email });
+
+    if (!user) return res.status(400).json({ message: "We were unable to find a user with that email." });
+
+    if (user.emailVerified)
+      return res.status(403).json({ message: "This account is already verified. Please log in." });
+
+    let newToken = await TokenModel.create({
+      userID: user._id,
+      token: uuidv4(),
+      expiresIn: moment().add(1, "hours"),
+      tokenType: "email-verification",
+    });
+
+    const to = user.email;
+    const subject = "Activate your Oral Moral's Account Now";
+    const html = `<p>You're just one click away from getting started with Museum Experience. All you need to do is verify your email address to activate your Oral Morals account. Click <a href="http://localhost:${process.env.PORT}/verify/${newToken.token}">here</a></p>`;
+
+    sendEmail(to, subject, html);
+
+    res.status(200).json({ message: `A verification email has been sent to ${user.email}.` });
+  } catch (err) {
+    console.log(err);
+    if (err) return res.status(500).json({ message: "Something went wrong. Please try again later" });
+  }
+};
+
+exports.passwordReset = async (req, res) => {
+  try {
+    let token = await TokenModel.findOne({ token: req.body.token });
+
+    if (!token)
+      return res
+        .status(401)
+        .json({ message: "Token may be expired. If you can't login, please request another token." });
+
+    if (token.expired)
+      return res
+        .status(401)
+        .json({ message: "Token may be expired. If you can't login, please request another token." });
+
+    if (moment(token.expiresIn) < moment()) {
+      token.expired = true;
+      await token.save();
+
+      return res
+        .status(401)
+        .json({ message: "Token may be expired. If you can't login, please request another token." });
+
+      let user = await User.findOne({ _id: token.userID });
+
+      if (!user) return res.status(500).json({message: "Something went wrong. Please try again later"});
+
+      token.expired = true;
+      await token.save();
+
+      let hashedPassword = bcrypt.hashSync(req.body.newPassword, parseInt(process.env.SALT));
+
+      user.password = hashedPassword;
+
+      await user.save();
+
+      await TokenModel.updateMany({userID: user._id}, {expired: true});
+
+      const to = user.email;
+      const
+    }
+  } catch (err) {
+    console.log(err);
+    if (err) return res.status(500).json({ message: "Something went wrong. Please try again later" });
   }
 };
