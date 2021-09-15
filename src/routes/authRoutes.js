@@ -7,4 +7,6 @@ router.post("/eligibility/age", Auth.authorizeAge);
 
 router.post("/signup", Auth.signup);
 
+router.post("/login", Auth.login);
+
 module.exports = router;
