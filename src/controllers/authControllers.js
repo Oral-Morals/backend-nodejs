@@ -164,7 +164,7 @@ exports.emailVerification = async (req, res) => {
   }
 };
 
-exports.resendEmailVerToken = async (req, res) => {
+exports.authorizeUser = async (req, res, next) => {
   try {
     let user = await User.findOne({ email: req.body.email });
 
