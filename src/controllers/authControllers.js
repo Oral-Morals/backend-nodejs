@@ -31,37 +31,6 @@ exports.authorizeAge = async (req, res, next) => {
   }
 };
 
-exports.authorizeUser = async (req, res, next) => {
-  try {
-    // Check if authorization header credentials were sent with request.
-    if (!req.headers.authorization) return res.status(401).json({ message: "Authorization header required" });
-
-    // Check if the authorization type is Bearer.
-    if (!req.headers.authorization.startsWith("Bearer "))
-      return res.status(401).json({ message: "Authorization format is: Bearer <token>" });
-
-    // Get the token from the authorization header by removing "Bearer " from the string.
-    let token = req.headers.authorization.replace("Bearer ", "");
-
-    // Returns the payload if the signature is valid.
-    jwt.verify(token, process.env.JWT_SECRET, (error, decodedToken) => {
-      if (error) return res.status(500).json({ error });
-
-      // Check for invalid token.
-      if (!decodedToken) return res.status(401).json({ message: "Invalid authorization token. Please login." });
-
-      // The decodedToken values are the user's details.
-      req.user = decodedToken;
-
-      // Go to next available middleware.
-      next();
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server error. Possible error with token." });
-  }
-};
-
 //@route POST '/signup'
 //@desc Register/Signup a new user
 //@access Public
@@ -133,6 +102,7 @@ exports.login = async (req, res) => {
   }
 };
 
+
 exports.emailVerification = async (req, res) => {
   try {
     let token = await TokenModel.findOne({ token: req.params.token });
@@ -168,6 +138,9 @@ exports.emailVerification = async (req, res) => {
 };
 
 exports.resendEmailVerToken = async (req, res) => {
+
+exports.authorizeUser = async (req, res, next) => {
+
   try {
     let user = await User.findOne({ email: req.body.email });
 
