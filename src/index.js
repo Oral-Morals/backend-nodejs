@@ -22,7 +22,7 @@ dbSetup();
 // ROUTES
 //==================================================
 app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/media", mediaRoutes);
+app.use("/api/v1/media-upload", mediaRoutes);
 
 //==================================================
 // SEEDERS
