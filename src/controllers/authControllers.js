@@ -94,39 +94,6 @@ exports.signup = async (req, res) => {
   }
 };
 
-exports.login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    // Search for existing user by email
-    const user = await User.findOne({ email });
-    if (!user)
-      return res.status(401).json({
-        message: `The email ${user.email} is not associated with any account. Double-check your email and try again.`,
-      });
-
-    // If existing user is found, compare passwords
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(400).json({ message: "Incorrect Email or Password" });
-
-    const token = jwt.sign(
-      {
-        id: user._id,
-        email: user.email,
-        dateOfBirth: user.dateOfBirth,
-        username: user.username,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "24h" }
-    );
-    // If passwords match, log in the user
-    return res.status(200).json({ message: `${user.email} logged in successfully!`, token });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
 exports.emailVerification = async (req, res) => {
   try {
     let token = await TokenModel.findOne({ token: req.params.token });
@@ -164,7 +131,7 @@ exports.emailVerification = async (req, res) => {
   }
 };
 
-exports.authorizeUser = async (req, res, next) => {
+exports.resendEmailVerToken = async (req, res) => {
   try {
     let user = await User.findOne({ email: req.body.email });
 
@@ -190,6 +157,39 @@ exports.authorizeUser = async (req, res, next) => {
   } catch (err) {
     console.log(err);
     if (err) return res.status(500).json({ message: "Something went wrong. Please try again later" });
+  }
+};
+
+exports.login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Search for existing user by email
+    const user = await User.findOne({ email });
+    if (!user)
+      return res.status(401).json({
+        message: `The email ${user.email} is not associated with any account. Double-check your email and try again.`,
+      });
+
+    // If existing user is found, compare passwords
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) return res.status(400).json({ message: "Incorrect Email or Password" });
+
+    const token = jwt.sign(
+      {
+        id: user._id,
+        email: user.email,
+        dateOfBirth: user.dateOfBirth,
+        username: user.username,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" }
+    );
+    // If passwords match, log in the user
+    return res.status(200).json({ message: `${user.email} logged in successfully!`, token });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
