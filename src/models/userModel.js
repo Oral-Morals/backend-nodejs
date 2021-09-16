@@ -4,9 +4,11 @@ const UserSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
+      default: null,
     },
     lastName: {
       type: String,
+      default: null,
     },
     dateOfBirth: {
       type: Date,

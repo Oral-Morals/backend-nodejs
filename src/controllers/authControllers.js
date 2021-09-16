@@ -13,7 +13,7 @@ moment().format();
 exports.signup = async (req, res) => {
   try {
     // Search for existing user email
-    const user = await User.findOne({ email: req.body.email } || { username: req.body.username });
+    const user = await User.findOne({ email: req.body.email });
     if (user)
       return res.status(401).json({
         message: "The email address you have entered is already associated with another account",
@@ -24,12 +24,9 @@ exports.signup = async (req, res) => {
 
     // Create new user
     const newUser = await User.create({
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
       username: req.body.username,
       email: req.body.email,
       dateOfBirth: req.body.dateOfBirth,
-      profilePicture: req.body.profilePicture,
       password: hashedPassword,
     });
 
@@ -50,29 +47,28 @@ exports.signup = async (req, res) => {
 //@access Public
 exports.login = async (req, res) => {
   try {
-    const { email, password } = await req.body;
+    const { email, password } = req.body;
 
     // Search for existing user by email
     const user = await User.findOne({ email });
     if (!user)
       return res.status(401).json({
-        message: "The email " + email + " is not associated with any account. Double-check your email and try again.",
+        message: `The email ${user.email} is not associated with any account. Double-check your email and try again.`,
       });
 
     // If existing user is found, compare passwords
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(400).json({ message: "Incorrect Email or Password" });
 
-    await jwt.sign(
+    const token = jwt.sign(
       {
-        firstName: user.firstName,
-        lastName: user.lastName,
         id: user._id,
         email: user.email,
         dateOfBirth: user.dateOfBirth,
+        username: user.username,
       },
       process.env.JWT_SECRET,
-      { expiresIn: moment().add(1, "hours") }
+      { expiresIn: "24h" }
     );
     // If passwords match, log in the user
     return res.status(200).json({ message: `${user.email} logged in successfully!`, token });
