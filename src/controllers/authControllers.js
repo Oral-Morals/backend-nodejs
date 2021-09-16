@@ -62,9 +62,6 @@ exports.authorizeUser = async (req, res, next) => {
   }
 };
 
-//@route POST '/signup'
-//@desc Register/Signup a new user
-//@access Public
 exports.signup = async (req, res) => {
   try {
     // Search for existing user email
@@ -97,9 +94,6 @@ exports.signup = async (req, res) => {
   }
 };
 
-//@route POST '/signup'
-//@desc Register/Signup a new user
-//@access Public
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -153,7 +147,10 @@ exports.emailVerification = async (req, res) => {
 
     let user = await User.findOne({ _id: token.userID });
 
-    if (!user) return res.status(400).json({ message: "This account is already verified. Please log in" });
+    if (!user) return res.status(400).json({ message: "Could not find a user with this token." });
+
+    if (user.emailVerified)
+      return res.status(400).json({ message: "This account is already verified. Please log in." });
 
     user.emailVerified = true;
     await user.save();
@@ -185,9 +182,9 @@ exports.resendEmailVerToken = async (req, res) => {
 
     const to = user.email;
     const subject = "Activate your Oral Moral's Account Now";
-    const html = `<p>You're just one click away from getting started with Museum Experience. All you need to do is verify your email address to activate your Oral Morals account. Click <a href="http://localhost:${process.env.PORT}/verify/${newToken.token}">here</a></p>`;
+    const html = `<p>You're just one click away from getting started with Oral Morals. All you need to do is verify your email address to activate your Oral Morals account. Click <a href="http://localhost:${process.env.PORT}/verify/${newToken.token}">here</a></p>`;
 
-    sendEmail(to, subject, html);
+    // sendEmail(to, subject, html);
 
     res.status(200).json({ message: `A verification email has been sent to ${user.email}.` });
   } catch (err) {
@@ -209,9 +206,9 @@ exports.passwordResetRequest = async (req, res) => {
 
     const to = user.email;
     const subject = "Fogot your password?";
-    const html = `<p>Click <a href=""reset-form-with-token>here</a> to reset your password.</p>`;
+    const html = `<p>Click <a href="reset-form-with-token>here</a> to reset your password.</p>`;
 
-    sendEmail(to, subject, html);
+    // sendEmail(to, subject, html);
 
     return res
       .status(200)
@@ -252,7 +249,7 @@ exports.passwordReset = async (req, res) => {
     token.expired = true;
     await token.save();
 
-    let hashedPassword = bcrypt.hashSync(req.body.newPassword, parseInt(process.env.SALT));
+    const hashedPassword = await bcrypt.hash(req.body.password, parseInt(process.env.SALT));
 
     user.password = hashedPassword;
 
@@ -264,7 +261,7 @@ exports.passwordReset = async (req, res) => {
     const subject = "Password updated";
     const html = `<p>Your password has been updated. Please login.</p>`;
 
-    sendEmail(to, subject, html);
+    // sendEmail(to, subject, html);
 
     res.status(200).json({ message: "Password updated. Please login." });
   } catch (err) {
