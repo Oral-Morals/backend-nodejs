@@ -2,7 +2,7 @@ const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const moment = require("moment");
-const { TokenModel } = require("../models/tokens");
+const { TokenModel } = require("../models/tokenModel");
 const { v4: uuidv4 } = require("uuid");
 // const sendEmail = require("../services/emailService");
 moment().format();
@@ -63,8 +63,19 @@ exports.login = async (req, res) => {
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(400).json({ message: "Incorrect Email or Password" });
 
+    await jwt.sign(
+      {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        id: user._id,
+        email: user.email,
+        dateOfBirth: user.dateOfBirth,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: moment().add(1, "hours") }
+    );
     // If passwords match, log in the user
-    return res.status(200).json({ message: "You are now logged in!" });
+    return res.status(200).json({ message: `${user.email} logged in successfully!`, token });
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, message: error.message });
