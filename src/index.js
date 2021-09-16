@@ -22,6 +22,8 @@ dbSetup();
 // ROUTES
 //==================================================
 app.use("/api/v1/auth", authRoutes);
+
+// TODO: Add login authorization middleware to /api/v1/media-upload
 app.use("/api/v1/media-upload", mediaRoutes);
 
 //==================================================
