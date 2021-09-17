@@ -82,10 +82,22 @@ exports.signup = async (req, res) => {
       password: hashedPassword,
     });
 
+    //Create Token for new user
+    let token = await TokenModel.create({
+      userID: newUser._id,
+      token: uuidv4(),
+      expiresIn: moment().add(1, "hours"),
+      tokenType: "email-verification",
+    });
+
     await newUser.save();
 
-    //Create Token
-    const token = jwt.sign({ newUser }, process.env.JWT_SECRET);
+    // Properties to send through the email
+    const to = newUser.email;
+    const subject = "Activate your Oral Morals Account Now";
+    const html = `<p>You're just one click away from getting started with Oral Morals. All you need to do is verify your email address to activate your Oral Morals account. Click <a href=""http://localhost:${process.env.PORT}/api/v1/verify/:${token}></p>`;
+
+    // sendEmail(to, subject, html);
 
     return res.status(201).json({ message: "New User Created", token });
   } catch (error) {
@@ -96,32 +108,41 @@ exports.signup = async (req, res) => {
 
 exports.emailVerification = async (req, res) => {
   try {
+    // Search for the token to verify
     let token = await TokenModel.findOne({ token: req.params.token });
 
+    // Send this message if the found token is expired
     if (token.expired)
       return res
         .status(401)
         .json({ message: "Token may be expired. If you can't login, please request another token." });
 
+    // If the time for the token's validity is expired, save token status as expired.
     if (moment(token.expiresIn) < moment()) {
       token.expired = true;
       await token.save();
 
+      // Send this message if token is expired
       return res
         .status(401)
         .json({ message: "Token may be expired. If you can't login, please request another token." });
     }
 
+    // Search for the user by it's token
     let user = await User.findOne({ _id: token.userID });
 
+    // Send this message if the user could not be found
     if (!user) return res.status(400).json({ message: "Could not find a user with this token." });
 
+    // Send this message if the user found has already been verified
     if (user.emailVerified)
       return res.status(400).json({ message: "This account is already verified. Please log in." });
 
+    // If the user found has been verified, change the status to true
     user.emailVerified = true;
     await user.save();
 
+    //Update these properties in the token model
     await TokenModel.updateMany({ userID: user._id }, { expired: true });
 
     return res.status(200).json({ message: "Your account has been verified! Please log in." });
@@ -206,6 +227,7 @@ exports.passwordResetRequest = async (req, res) => {
 
     const to = user.email;
     const subject = "Fogot your password?";
+    //TODO: wait for design before any changes are made to this link
     const html = `<p>Click <a href="reset-form-with-token>here</a> to reset your password.</p>`;
 
     // sendEmail(to, subject, html);
