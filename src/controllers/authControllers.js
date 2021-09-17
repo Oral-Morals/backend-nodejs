@@ -226,7 +226,7 @@ exports.passwordResetRequest = async (req, res) => {
     });
 
     const to = user.email;
-    const subject = "Fogot your password?";
+    const subject = "Forgot your password?";
     //TODO: wait for design before any changes are made to this link
     const html = `<p>Click <a href="reset-form-with-token>here</a> to reset your password.</p>`;
 
