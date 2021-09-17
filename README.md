@@ -37,9 +37,9 @@ Step 4
 - Make sure you are on the correct branch.
 - Start server in development mode with `npm run dev`.
 - Work.
-- Add all your work to the staging area with `git add .`.
+- Add all your work to the staging area with `git add .`
 - Commit changes with `git commit -m "short description of work done here"`.
-- If you added to your .env file, update the .env-example file as well.
+- If you added any variables to your .env file, update the .env-example file as well.
 
 Step 5
 
@@ -48,10 +48,10 @@ Step 5
 
 Step 6
 
-- Push your code to upstream with `git push origin branch_name`.
-- Now you can proceed to github to create a _pull request_ to the _main_ branch.
-- Your pull request will be merged once it is verified not to have conflicts.
-- _Please do not push directly to the main branch_
+- Please do not push directly to the main branch
+- Push your code to upstream with `git push origin branch-name`.
+- Now you can proceed to [github](https://github.com/Oral-Morals/backend-nodejs/pulls) to create a pull request to the main branch.
+- Your pull request will be merged once it is verified not to have conflicts or errors.
 
 ## Troubleshooting
 
