@@ -17,13 +17,12 @@ const UserSchema = new mongoose.Schema(
     username: {
       type: String,
       min: 3,
-      max: 20,
+      max: 15,
       unique: true,
     },
     email: {
       type: String,
       required: true,
-      max: 50,
       unique: true,
     },
     password: {
@@ -48,18 +47,18 @@ const UserSchema = new mongoose.Schema(
       enum: ["curator", "admin", "user"],
       default: "user",
     },
-    country: {
-      type: String,
-      max: 50,
-      default: null,
-    },
-    ethnicity: {
-      type: String,
-      default: null,
+    heritage: {
+      type: Array,
+      default: [],
     },
     language: {
+      type: Array,
+      default: [],
+    },
+    bio: {
       type: String,
       default: null,
+      max: 160,
     },
   },
   { timestamps: true }
