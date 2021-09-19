@@ -1,47 +1,56 @@
 const cloudinary = require("../utils/cloudinary-config");
+const moment = require("moment");
+
+moment().format();
 
 // Exports the cloudinary object.
 exports.cloudinary = cloudinary;
 
-// Uploads the user's profile picture to cloudinary.
-exports.profilePicToCloudinary = async (req, res, next) => {
-  console.log("req.file");
-  console.log(req.file);
-  console.log(req.user);
-
-  await cloudinary.uploader
-    .upload(`./src/uploads/${req.file.originalname}`, {
-      resource_type: "image",
-      // The path below is folder/image
-      public_id: `users/${req.user.id}/${req.user.username}/profile-pic/${req.file.fieldname}`,
-      overwrite: true,
-    })
-    .then((result) => {
-      req.cloudinary = result;
-    })
-    .catch((error) => {
-      console.log("error", JSON.stringify(error, null, 2));
-    });
-  next();
+// Get appropriate resource type by looking at the MIME type on the req.file.mimetype property set by Multer.
+const resourceType = (mimeType) => {
+  // Cloudinary supports many different file formats, which it categorizes into three different asset types:
+  // image, video (also includes audio files) and raw.
+  if (mimeType.includes("audio")) return "video";
+  if (mimeType.includes("image")) return "image";
+  if (mimeType.includes("video")) return "video";
 };
 
-// Uploads the user's video to cloudinary.
-exports.videoToCloudinary = async (req, res, next) => {
-  console.log("req.file");
-  console.log(req.file);
-  cloudinary.uploader
-    .upload("./src/uploads/test-video.mp4", {
-      resource_type: "video",
-      // The path below is folder/image
-      public_id: "test/test-video",
+const buildPublicID = (req) => {
+  // Initialize variables to be used in returned string.
+  let contentFolder;
+
+  let fileName;
+
+  // For profile pictures, set the folder name to "profile-pic".
+  if (req.path === "/profile-pic") contentFolder = "/profile-pic";
+
+  // For posts, set the folder name to "post" with the time of upload.
+  if (req.path === "/post/audio" || req.path === "/post/video") contentFolder = `posts/post-${moment().format()}`;
+
+  // For single media uploads set the file name to the field name.
+  if (req.file) fileName = req.file.fieldname;
+
+  // The path below is users/${database ID}/${username}/${content folder: post or profile pic}}/${the form field name}.
+  return `users/${req.user.id}/${req.user.username}/${contentFolder}/${fileName}`;
+};
+
+// Uploads the user's media to cloudinary.
+exports.uploadToCloudinary = async (req, res, next) => {
+  try {
+    const upload = await cloudinary.uploader.upload(`${req.file.destination}${req.file.originalname}`, {
+      resource_type: resourceType(req.file.mimetype),
+
+      public_id: buildPublicID(req),
+
+      // Overwrite a file with the same name.
       overwrite: true,
-    })
-    .then((result) => {
-      console.log("success", JSON.stringify(result, null, 2));
-    })
-    .catch((error) => {
-      console.log("error", JSON.stringify(error, null, 2));
+      // tags: ["example", "example-2"],
     });
+
+    req.cloudinary = upload;
+  } catch (error) {
+    console.log(error);
+  }
 
   next();
 };

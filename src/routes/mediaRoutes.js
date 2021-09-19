@@ -9,7 +9,23 @@ router.post(
   "/profile-pic",
   Auth.authorizeUser,
   processInput.profilePic,
-  processOutput.profilePicToCloudinary,
+  processOutput.uploadToCloudinary,
+  Media.handleProfilePic
+);
+
+router.post(
+  "/post/audio",
+  Auth.authorizeUser,
+  processInput.audio,
+  processOutput.uploadToCloudinary,
+  Media.handleProfilePic
+);
+
+router.post(
+  "/post/video",
+  Auth.authorizeUser,
+  processInput.video,
+  processOutput.uploadToCloudinary,
   Media.handleProfilePic
 );
 // router.post("/single", processUploads.multer.single("image"), Media.uploadSingle);
