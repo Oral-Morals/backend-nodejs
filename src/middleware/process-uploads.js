@@ -1,39 +1,53 @@
-const multer = require("multer");
-const path = require("path");
+const multer = require("../utils/multer-config");
+const cloudinary = require("../utils/cloudinary-config");
 
-// Multer Storage Engine configs
-// Enable disk storage so files can be saved to this project.
-const diskStorage = multer.diskStorage({
-  destination: "./src/uploads/",
+// Export multer and cloudinary already configured.
+exports.multer = multer;
+exports.cloudinary = cloudinary;
 
-  filename: function (req, file, cb) {
-    console.log(file);
+// exports.upload = async (req, res, next) => {
+//   console.log("inside upload function");
+//   multer.single("image");
+//   console.log("after multer function");
+//   next();
+// };
 
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+exports.upload = multer.single("image");
+// exports.upload = multer.single("video");
 
-    cb(null, file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname));
-  },
-});
+// exports.uploadToCloudinary = cloudinary.uploader.upload(req.file.originalname, function (error, result) {
+//   console.log(result);
+// });
 
-// The memory storage engine stores the files in memory as Buffer objects. It doesn't have any options.
-// WARNING: Uploading very large files, or relatively small files in large numbers very quickly,
-// can cause your application to run out of memory when memory storage is used.
-const memoryStorage = multer.memoryStorage();
+exports.uploadToCloudinary = async (req, res, next) => {
+  console.log("req.file");
+  console.log(req.file);
+  // cloudinary.uploader
+  //   .upload("./src/uploads/test-video.mp4", {
+  //     resource_type: "video",
+  //     // The path below is folder/image
+  //     public_id: "test/test-video",
+  //     overwrite: true,
+  //   })
+  //   .then((result) => {
+  //     console.log("success", JSON.stringify(result, null, 2));
+  //   })
+  //   .catch((error) => {
+  //     console.log("error", JSON.stringify(error, null, 2));
+  //   });
 
-// Pass the storage engine as an object.
-// Export multer to be used as middleware from this file.
-
-// Process a single image.
-module.exports.singleImage = multer({ storage: diskStorage }).single("image");
-
-// Process multiple media.
-module.exports.multipleMedia = multer({ storage: diskStorage }).fields([
-  { name: "image" },
-  { name: "video" },
-  { name: "audio" },
-]);
-
-// TODO
-// Max files of which type?
-// Max size of each file type?
-// Architecture of routes and controllers for profile picture and posts
+  cloudinary.uploader
+    .upload("./src/uploads/om.PNG", {
+      resource_type: "image",
+      // The path below is folder/image
+      public_id: "test/test",
+      overwrite: true,
+    })
+    .then((result) => {
+      console.log("success", JSON.stringify(result, null, 2));
+    })
+    .catch((error) => {
+      console.log("error", JSON.stringify(error, null, 2));
+    });
+  next();
+};

@@ -1,16 +1,17 @@
 const User = require("../models/userModel");
 
-exports.uploadSingle = async (req, res) => {
+exports.handleProfilePic = async (req, res) => {
   try {
-    // multiple file uploads
-    if (req.files) {
-      return res.status(202).json({ status: "processing", data: { files: req.files } });
-    }
-
-    // single file upload
+    // Get profile picture URL from Cloudinary and save to database.
+    console.log(req.cloudinary);
     return res.status(202).json({ status: "processing", data: { file: req.file } });
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// multiple file uploads
+// if (req.files) {
+//   return res.status(202).json({ status: "processing", data: { files: req.files } });
+// }
