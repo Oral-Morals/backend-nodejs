@@ -30,8 +30,8 @@ const buildPublicID = (req) => {
   // Set the file name to the field name.
   if (req.file) fileName = req.file.fieldname;
 
-  // The path below is users/${database ID}/${username}/${content folder: post or profile pic}}/${the form field name}.
-  return `users/${req.user.id}/${req.user.username}/${contentFolder}/${fileName}`;
+  // The path below is users/${username}-${database ID}/${content folder: post or profile pic}}/${the form field name}.
+  return `users/${req.user.username}-${req.user.id}/${contentFolder}/${fileName}`;
 };
 
 // Uploads the user's media to cloudinary.
@@ -48,6 +48,8 @@ exports.uploadToCloudinary = async (req, res, next) => {
 
       // Overwrite a file with the same name.
       overwrite: true,
+
+      // Tags for cloudinary uploads. Do we need to use tags?
       // tags: ["example", "example-2"],
     });
 

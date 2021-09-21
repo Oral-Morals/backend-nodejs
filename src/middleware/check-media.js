@@ -18,12 +18,14 @@ exports.fileTypes = async (req, res, next) => {
 
     // Checks for the correct route, the correct form field, and if there is more than one form field
     // return an error response.
-    if (req.path === "/profile-pic" && req.files.profilePic && Object.keys(req.files).length === 1) {
-      req.file = transferObjectProperties(req.files.profilePic[0]);
-    } else {
+    if (req.path === "/profile-pic" && req.files.profilePic && Object.keys(req.files).length > 1) {
       return res
         .status(400)
         .json({ success: false, message: "Only the profilePic form field should be filled out for this request." });
+    }
+
+    if (req.path === "/profile-pic" && req.files.profilePic) {
+      req.file = transferObjectProperties(req.files.profilePic[0]);
     }
 
     //===========================================
