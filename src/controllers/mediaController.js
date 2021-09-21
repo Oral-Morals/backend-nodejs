@@ -8,7 +8,7 @@ exports.handleProfilePic = async (req, res) => {
     const user = await User.findOne({ _id: req.user.id });
 
     // Add profile picture link to user data.
-    user.profilePicture = req.cloudinary.secure_url;
+    user.profilePicture = { link: req.cloudinary.secure_url, cloudinaryPublicID: req.cloudinary.public_id };
 
     await user.save();
 
@@ -27,7 +27,7 @@ exports.createPost = async (req, res) => {
       userId: req.user.id,
       caption: req.body.caption,
       mediaType: req.file.fieldname,
-      mediaLink: req.cloudinary.secure_url,
+      mediaLink: { link: req.cloudinary.secure_url, cloudinaryPublicID: req.cloudinary.public_id },
     });
 
     await newPost.save();

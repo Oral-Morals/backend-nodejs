@@ -30,7 +30,7 @@ const PostSchema = new mongoose.Schema(
       required: true,
     },
     mediaLink: {
-      type: String,
+      type: Object,
       required: true,
     },
   },

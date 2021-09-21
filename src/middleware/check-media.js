@@ -9,9 +9,6 @@ exports.fileTypes = async (req, res, next) => {
   };
 
   try {
-    // console.log("src/middleware/check-media---logging: req.files:");
-    // console.log(req.files);
-
     //===========================================
     // Handles profile picture
     //===========================================
