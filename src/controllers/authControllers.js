@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const moment = require("moment");
 const { TokenModel } = require("../models/tokenModel");
 const { v4: uuidv4 } = require("uuid");
-// const sendEmail = require("../services/emailService");
+const { sendMail } = require("../services/emailService");
 moment().format();
 
 exports.authorizeAge = async (req, res, next) => {
@@ -90,14 +90,15 @@ exports.signup = async (req, res) => {
       tokenType: "email-verification",
     });
 
-    await newUser.save();
-
     // Properties to send through the email
     const to = newUser.email;
     const subject = "Activate your Oral Morals Account Now";
-    const html = `<p>You're just one click away from getting started with Oral Morals. All you need to do is verify your email address to activate your Oral Morals account. Click <a href=""http://localhost:${process.env.PORT}/api/v1/verify/:${token}></p>`;
+    const html = `<p>
+        You're just one click away from getting started with Oral Morals. All you need to do is verify your email
+        address to activate your Oral Morals account. Click <a href="http://localhost:${process.env.PORT}/api/v1/auth/verify/${token.token}">here</a>
+      </p>`;
 
-    // sendEmail(to, subject, html);
+    await sendMail({ to, subject, html });
 
     return res.status(201).json({ message: "New User Created", token });
   } catch (error) {
@@ -135,11 +136,10 @@ exports.emailVerification = async (req, res) => {
     if (!user) return res.status(400).json({ message: "Could not find a user with this token." });
 
     // Send this message if the user found has already been verified
-    if (user.emailVerified)
-      return res.status(400).json({ message: "This account is already verified. Please log in." });
+    if (user.isVerified) return res.status(400).json({ message: "This account is already verified. Please log in." });
 
     // If the user found has been verified, change the status to true
-    user.emailVerified = true;
+    user.isVerified = true;
     await user.save();
 
     //Update these properties in the token model
@@ -148,7 +148,7 @@ exports.emailVerification = async (req, res) => {
     return res.status(200).json({ message: "Your account has been verified! Please log in." });
   } catch (err) {
     console.log(err);
-    if (err) return res.status(500).json({ message: "Something went wrong. Please try again later" });
+    if (err) return res.status(500).json({ success: false, message: err.message });
   }
 };
 
@@ -158,8 +158,7 @@ exports.resendEmailVerToken = async (req, res) => {
 
     if (!user) return res.status(400).json({ message: "We were unable to find a user with that email." });
 
-    if (user.emailVerified)
-      return res.status(403).json({ message: "This account is already verified. Please log in." });
+    if (user.isVerified) return res.status(403).json({ message: "This account is already verified. Please log in." });
 
     let newToken = await TokenModel.create({
       userID: user._id,
@@ -172,7 +171,7 @@ exports.resendEmailVerToken = async (req, res) => {
     const subject = "Activate your Oral Moral's Account Now";
     const html = `<p>You're just one click away from getting started with Oral Morals. All you need to do is verify your email address to activate your Oral Morals account. Click <a href="http://localhost:${process.env.PORT}/verify/${newToken.token}">here</a></p>`;
 
-    // sendEmail(to, subject, html);
+    await sendMail(to, subject, html);
 
     res.status(200).json({ message: `A verification email has been sent to ${user.email}.` });
   } catch (err) {
@@ -229,8 +228,9 @@ exports.passwordResetRequest = async (req, res) => {
     const subject = "Forgot your password?";
     //TODO: wait for design before any changes are made to this link
     const html = `<p>Click <a href="reset-form-with-token>here</a> to reset your password.</p>`;
+    // const deepLink = TODO:get deep link
 
-    // sendEmail(to, subject, html);
+    //await sendMail({ to, subject, html });
 
     return res
       .status(200)
