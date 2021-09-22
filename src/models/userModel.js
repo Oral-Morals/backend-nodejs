@@ -60,6 +60,10 @@ const UserSchema = new mongoose.Schema(
       default: null,
       max: 160,
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
