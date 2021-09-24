@@ -1,8 +1,18 @@
 const nodemailer = require("nodemailer");
 
+// // Use this for Mailtrap for development.
+// const transporter = nodemailer.createTransport({
+//   port: process.env.DEV_MAIL_PORT,
+//   host: process.env.DEV_MAIL_HOST,
+//   auth: {
+//     user: process.env.DEV_MAIL_USERNAME,
+//     pass: process.env.DEV_MAIL_PASSWORD,
+//   },
+//   // secure: true,
+// });
+
 const transporter = nodemailer.createTransport({
-  port: process.env.MAIL_PORT,
-  host: process.env.MAIL_HOST,
+  service: "gmail",
   auth: {
     user: process.env.MAIL_USERNAME,
     pass: process.env.MAIL_PASSWORD,
