@@ -3,9 +3,6 @@ const moment = require("moment");
 
 moment().format();
 
-// Exports the cloudinary object.
-exports.cloudinary = cloudinary;
-
 // Get appropriate resource type by looking at the MIME type on the req.file.mimetype property set by Multer.
 const resourceType = (mimeType) => {
   // Cloudinary supports many different file formats, which it categorizes into three different asset types:

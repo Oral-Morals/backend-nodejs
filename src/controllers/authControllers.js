@@ -188,7 +188,7 @@ exports.login = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user)
       return res.status(401).json({
-        message: `The email ${user.email} is not associated with any account. Double-check your email and try again.`,
+        message: `The email ${req.body.email} is not associated with any account. Double-check your email and try again.`,
       });
 
     // If existing user is found, compare passwords

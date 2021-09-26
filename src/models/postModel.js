@@ -29,7 +29,7 @@ const PostSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    mediaLink: {
+    mediaLinks: {
       type: Object,
       required: true,
     },
