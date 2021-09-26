@@ -45,7 +45,10 @@ exports.updateProperties = async (req, res, next) => {
           .json({ status: "fail", message: "Audio and video media types not allowed in the same request." });
       }
 
-      if (req.files.audio) req.file = transferObjectProperties(req.files.audio[0]);
+      if (req.files.audio && req.files.image) {
+        req.file = transferObjectProperties(req.files.audio[0]);
+        req.file.image = transferObjectProperties(req.files.image[0]);
+      }
 
       if (req.files.video) req.file = transferObjectProperties(req.files.video[0]);
     }

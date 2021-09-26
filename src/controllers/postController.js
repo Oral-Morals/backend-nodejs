@@ -26,7 +26,7 @@ exports.createPost = async (req, res) => {
       mediaType: req.file.fieldname,
       mediaLinks: {
         audioVideo: req.cloudinary.secure_url,
-        image: videoThumbnail || "audio image link here",
+        image: videoThumbnail || req.cloudinary.image.secure_url,
         cloudinaryPublicID: req.cloudinary.public_id,
       },
     });
