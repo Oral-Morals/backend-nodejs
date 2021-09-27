@@ -31,8 +31,8 @@ const UserSchema = new mongoose.Schema(
       min: 6,
     },
     profilePicture: {
-      type: String,
-      default: null,
+      type: Object,
+      default: {},
     },
     followers: {
       type: Array,

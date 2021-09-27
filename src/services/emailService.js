@@ -31,9 +31,9 @@ exports.sendMail = async (mailOptions = {}) => {
 
     // console.log({ mailOptions, mailData });
 
-    await transporter.sendMail(mailData, (info) => {
-      console.log({ message: "Mail sent", message_id: info.message });
-    });
+    // await transporter.sendMail(mailData, (info) => {
+    //   console.log({ message: "Mail sent", message_id: info.message });
+    // });
   } catch (error) {
     console.log(error);
   }
