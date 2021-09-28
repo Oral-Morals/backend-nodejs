@@ -15,4 +15,6 @@ router.patch(
   userController.updateProfilePic
 );
 
+router.patch("/profile", authController.authorizeUser, userController.updateProfile);
+
 module.exports = router;
