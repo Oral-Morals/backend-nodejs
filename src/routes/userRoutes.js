@@ -6,6 +6,11 @@ const checkMedia = require("../middleware/check-media");
 const processOutput = require("../middleware/process-output");
 const userController = require("../controllers/userController");
 
+router
+  .route("/profile")
+  .get(authController.authorizeUser, userController.fetchProfile)
+  .patch(authController.authorizeUser, userController.updateProfile);
+
 router.patch(
   "/profile-pic",
   authController.authorizeUser,
@@ -14,7 +19,5 @@ router.patch(
   processOutput.uploadToCloudinary,
   userController.updateProfilePic
 );
-
-router.patch("/profile", authController.authorizeUser, userController.updateProfile);
 
 module.exports = router;
