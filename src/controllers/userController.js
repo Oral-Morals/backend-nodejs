@@ -2,16 +2,20 @@ const User = require("../models/userModel");
 
 // Fetch user data.
 exports.fetchProfile = async (req, res) => {
+  console.log(req.user);
   // Find a user by their ID.
   // Use select(string) method to certain fields from being returned.
   // TODO: Are we sending back a user's email address if they not the account owner?
-  const user = await User.findById(req.body.id).select(
+  let user = await User.findById(req.params.userID).select(
     "-password -dateOfBirth -role -isVerified -createdAt -updatedAt -__v -profilePicture.cloudinaryPublicID"
   );
 
   // If a user is requesting another user's account, delete the email property.
-  // if (req.user.id !== req.body.id) delete user.email;
-  if (req.user.id !== req.body.id) user.email = null;
+  if (req.user.id !== req.params.userID) {
+    // Convert Mongoose document object to JavaScript object. Then delete the email property.
+    user = user.toObject();
+    delete user.email;
+  }
 
   return res.status(200).json({ status: "success", data: user });
 };
@@ -34,6 +38,7 @@ exports.updateProfilePic = async (req, res) => {
   }
 };
 
+// Update user data.
 exports.updateProfile = async (req, res) => {
   try {
     // Unpack the request body to use in the user model.

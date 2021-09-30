@@ -7,7 +7,7 @@ const processOutput = require("../middleware/process-output");
 const postController = require("../controllers/postController");
 
 router.post(
-  "/new-post",
+  "/posts/new-post",
   authController.authorizeUser,
   processInput.media,
   checkMedia.updateProperties,
