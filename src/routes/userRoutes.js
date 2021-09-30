@@ -6,6 +6,10 @@ const checkMedia = require("../middleware/check-media");
 const processOutput = require("../middleware/process-output");
 const userController = require("../controllers/userController");
 
+router.get("/users/:userID", authController.authorizeUser, userController.fetchProfile);
+
+router.patch("/users/profile", authController.authorizeUser, userController.updateProfile);
+
 router.patch(
   "/profile-pic",
   authController.authorizeUser,

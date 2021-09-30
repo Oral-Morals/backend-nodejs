@@ -19,10 +19,10 @@ const buildPublicID = (req) => {
   let fileName;
 
   // For profile pictures, set the folder name to "profile-pic".
-  if (req.path === "/profile-pic") contentFolder = "/profile-pic";
+  if (req.path === "/users/profile-pic") contentFolder = "/profile-pic";
 
   // For posts, set the folder name to "post" with the time of upload.
-  if (req.path === "/new-post") contentFolder = `posts/post-${moment().format()}`;
+  if (req.path === "/post/new-post") contentFolder = `posts/post-${moment().format()}`;
 
   // Set the file name to the field name.
   if (req.file) fileName = req.file.fieldname;
