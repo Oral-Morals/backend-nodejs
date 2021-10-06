@@ -8,8 +8,6 @@ const userController = require("../controllers/userController");
 
 router.get("/users/:userID", authController.authorizeUser, userController.fetchProfile);
 
-// router.patch("/users/profile", authController.authorizeUser, userController.updateProfile);
-
 router.patch(
   "/users/profile",
   authController.authorizeUser,
@@ -18,14 +16,5 @@ router.patch(
   processOutput.uploadToCloudinary,
   userController.updateProfile
 );
-
-// router.patch(
-//   "/profile-pic",
-//   authController.authorizeUser,
-//   processInput.media,
-//   checkMedia.updateProperties,
-//   processOutput.uploadToCloudinary,
-//   userController.updateProfilePic
-// );
 
 module.exports = router;
