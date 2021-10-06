@@ -28,6 +28,9 @@ app.use("/api/v1", userRoutes);
 const postRoutes = require("./routes/postRoutes");
 app.use("/api/v1", postRoutes);
 
+const mobileTestRoutes = require("./routes/mobileTestRoutes");
+app.use("/api/v1", mobileTestRoutes);
+
 //==================================================
 // SEEDERS
 //==================================================
