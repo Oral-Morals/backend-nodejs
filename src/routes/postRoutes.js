@@ -6,6 +6,8 @@ const checkMedia = require("../middleware/check-media");
 const processOutput = require("../middleware/process-output");
 const postController = require("../controllers/postController");
 
+router.get("/posts/:id", postController.fetchSinglePost);
+
 router.post(
   "/posts/new-post",
   authController.authorizeUser,

@@ -37,3 +37,17 @@ exports.createPost = async (req, res) => {
     res.status(500).json({ status: "fail", message: error.message });
   }
 };
+
+// Get a single post
+exports.fetchSinglePost = async (req, res) => {
+  try {
+    let query = await Post.findById(req.params.id);
+
+    if (!query) return res.status(404).json({ status: "fail", message: `Post not found.` });
+
+    return res.status(200).json({ data: query });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ status: "fail", message: error.message });
+  }
+};

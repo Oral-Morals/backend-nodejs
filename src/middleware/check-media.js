@@ -32,7 +32,7 @@ exports.updateProperties = async (req, res, next) => {
     // Handles new posts
     //===========================================
 
-    if (req.path === "/new-post") {
+    if (req.path === "/posts/new-post") {
       // Check if the post caption is present and return error if it is not.
       if (!req.body.caption)
         return res.status(400).json({ status: "fail", message: "The caption field must be filled out." });
