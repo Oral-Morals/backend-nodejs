@@ -59,6 +59,11 @@ exports.updateProfile = async (req, res) => {
     // Update bio.
     user.bio = bio;
 
+    if (req.file) {
+      // Add profile picture link to user data.
+      user.profilePicture = { link: req.cloudinary.secure_url, cloudinaryPublicID: req.cloudinary.public_id };
+    }
+
     await user.save();
 
     // Handle username.
