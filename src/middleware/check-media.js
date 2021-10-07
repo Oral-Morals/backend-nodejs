@@ -13,13 +13,19 @@ exports.updateProperties = async (req, res, next) => {
     // Handles profile picture
     //===========================================
 
-    if (req.path === "/profile-pic") {
+    if (req.path === "/users/profile") {
+      // Skip processing if there is no file uploaded.
+      if (!req.files) {
+        return next();
+      }
+
       // Checks for the correct route, the correct form field, and if there is more than one form field
       // return an error response.
       if (req.files.profilePic && Object.keys(req.files).length > 1) {
-        return res
-          .status(400)
-          .json({ status: "fail", message: "Only the profilePic form field should be filled out for this request." });
+        return res.status(400).json({
+          status: "fail",
+          message: "This route only accepts uploads to the profilePic field and json in the body",
+        });
       }
 
       if (req.files.profilePic) {

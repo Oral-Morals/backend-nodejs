@@ -19,7 +19,7 @@ const buildPublicID = (req) => {
   let fileName;
 
   // For profile pictures, set the folder name to "profile-pic".
-  if (req.path === "/users/profile-pic") contentFolder = "/profile-pic";
+  if (req.path === "/users/profile") contentFolder = "/profile-pic";
 
   // For posts, set the folder name to "post" with the time of upload.
   if (req.path === "/posts/new-post") contentFolder = `posts/post-${moment().format()}`;
@@ -34,6 +34,10 @@ const buildPublicID = (req) => {
 // Uploads the user's media to cloudinary.
 exports.uploadToCloudinary = async (req, res, next) => {
   try {
+    // Skip uploading to Cloudinary if there is no file uploaded in the profilePic field.
+    if (req.path === "/users/profile" && !req.file) {
+      return next();
+    }
     // upload takes the location of the file as the first argument.
     const upload = await cloudinary.uploader.upload(`${req.file.destination}${req.file.originalname}`, {
       // The resource type should be image, video or raw depending on the file.
@@ -46,7 +50,8 @@ exports.uploadToCloudinary = async (req, res, next) => {
       // Overwrite a file with the same name.
       overwrite: true,
 
-      // Tags for cloudinary uploads. Do we need to use tags?
+      // TODO: Do we need to use tags?
+      // Tags for cloudinary uploads.
       // tags: ["example", "example-2"],
     });
 
