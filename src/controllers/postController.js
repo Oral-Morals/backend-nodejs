@@ -15,9 +15,8 @@ exports.fetchUserPosts = async (req, res) => {
     const posts = await Post.find({ userId: req.params.id });
 
     if (posts.length === 0) {
-      return res.status(404).json({ status: "fail", message: "User posts not found." });
+      return res.status(200).json({ status: "success", message: "This user does not have any posts yet." });
     }
-    console.log(posts);
     return res.status(200).json({ data: posts });
   } catch (error) {
     return res.status(500).json({ status: "fail", message: error.message });
@@ -31,7 +30,7 @@ exports.fetchSinglePost = async (req, res) => {
 
     if (!query) return res.status(404).json({ status: "fail", message: `Post not found.` });
 
-    return res.status(200).json({ data: query });
+    return res.status(200).json({ status: "success", data: query });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ status: "fail", message: error.message });
