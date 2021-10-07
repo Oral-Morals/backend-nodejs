@@ -49,17 +49,20 @@ exports.updateProfile = async (req, res) => {
       "-password -dateOfBirth -role -isVerified -updatedAt -__v -profilePicture.cloudinaryPublicID"
     );
 
+    // *** Nullish coalescing operator (??) returns its right-hand side operand when
+    // its left-hand side operand is null or undefined, and otherwise returns its left-hand side operand. ***
+
     // Update name.
-    user.name = name;
+    user.name = name ?? user.name;
 
     // Update languages.
-    user.languages = languages;
+    user.languages = languages ?? user.languages;
 
     // Update heritages.
-    user.heritages = heritages;
+    user.heritages = heritages ?? user.heritages;
 
     // Update bio.
-    user.bio = bio;
+    user.bio = bio ?? user.bio;
 
     if (req.file) {
       // Add profile picture link to user data.
