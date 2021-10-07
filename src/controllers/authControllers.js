@@ -27,7 +27,7 @@ exports.authorizeAge = async (req, res, next) => {
     next();
   } catch (error) {
     console.log(error);
-    res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -58,7 +58,7 @@ exports.authorizeUser = async (req, res, next) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Server error. Possible error with token." });
+    return res.status(500).json({ message: "Server error. Possible error with token." });
   }
 };
 
@@ -103,7 +103,7 @@ exports.signup = async (req, res) => {
     return res.status(201).json({ message: "New User Created", token });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -209,7 +209,7 @@ exports.login = async (req, res) => {
     return res.status(200).json({ message: `${user.email} logged in successfully!`, token });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 

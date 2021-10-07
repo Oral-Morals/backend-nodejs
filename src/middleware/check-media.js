@@ -67,7 +67,6 @@ exports.updateProperties = async (req, res, next) => {
         req.file.image = transferObjectProperties(req.files.image[0]);
         return next();
       }
-
       return res.status(400).json({ status: "fail", message: "An audio or video file was NOT uploaded. " });
     }
   } catch (error) {

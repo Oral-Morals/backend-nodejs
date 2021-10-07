@@ -3,9 +3,24 @@ const Post = require("../models/postModel");
 // Get posts
 exports.fetchPosts = async (req, res) => {
   try {
-    console.log(req);
+    console.log("GET posts with filters");
   } catch (error) {
-    res.status(500).json({ status: "fail", message: error.message });
+    return res.status(500).json({ status: "fail", message: error.message });
+  }
+};
+
+// Get a user's posts
+exports.fetchUserPosts = async (req, res) => {
+  try {
+    const posts = await Post.find({ userId: req.params.id });
+
+    if (posts.length === 0) {
+      return res.status(404).json({ status: "fail", message: "User posts not found." });
+    }
+    console.log(posts);
+    return res.status(200).json({ data: posts });
+  } catch (error) {
+    return res.status(500).json({ status: "fail", message: error.message });
   }
 };
 
@@ -19,7 +34,7 @@ exports.fetchSinglePost = async (req, res) => {
     return res.status(200).json({ data: query });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ status: "fail", message: error.message });
+    return res.status(500).json({ status: "fail", message: error.message });
   }
 };
 
@@ -58,6 +73,6 @@ exports.createPost = async (req, res) => {
     return res.status(200).json({ status: "success", message: `New ${newPost.mediaType} post created.` });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ status: "fail", message: error.message });
+    return res.status(500).json({ status: "fail", message: error.message });
   }
 };

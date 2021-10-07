@@ -34,7 +34,7 @@ exports.updateProfilePic = async (req, res) => {
     return res.status(200).json({ status: "success", message: "Profile picture updated." });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ status: "fail", message: error.message });
+    return res.status(500).json({ status: "fail", message: error.message });
   }
 };
 
@@ -97,6 +97,6 @@ exports.updateProfile = async (req, res) => {
     return res.status(200).json({ status: "success", message: "Profile updated.", data: user });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ status: "fail", message: error.message });
+    return res.status(500).json({ status: "fail", message: error.message });
   }
 };

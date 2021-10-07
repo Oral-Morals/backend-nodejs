@@ -10,7 +10,7 @@ router.get("/posts", authController.authorizeUser, postController.fetchPosts);
 
 router.get("/posts/:id", authController.authorizeUser, postController.fetchSinglePost);
 
-// router.get("/posts/user/:id", authController.authorizeUser, postController.fetchUserPosts);
+router.get("/posts/user/:id", authController.authorizeUser, postController.fetchUserPosts);
 
 router.post(
   "/posts/new-post",
