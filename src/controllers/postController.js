@@ -1,5 +1,28 @@
 const Post = require("../models/postModel");
 
+// Get posts
+exports.fetchPosts = async (req, res) => {
+  try {
+    console.log(req);
+  } catch (error) {
+    res.status(500).json({ status: "fail", message: error.message });
+  }
+};
+
+// Get a single post
+exports.fetchSinglePost = async (req, res) => {
+  try {
+    let query = await Post.findById(req.params.id).select("-__v -updatedAt -mediaLinks.cloudinaryPublicID");
+
+    if (!query) return res.status(404).json({ status: "fail", message: `Post not found.` });
+
+    return res.status(200).json({ data: query });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ status: "fail", message: error.message });
+  }
+};
+
 // Get the URL from Cloudinary and save to database
 exports.createPost = async (req, res) => {
   try {
@@ -24,6 +47,7 @@ exports.createPost = async (req, res) => {
       userId: req.user.id,
       caption: req.body.caption,
       mediaType: req.file.fieldname,
+      heritage: req.body.heritage,
       mediaLinks: {
         audioVideo: req.cloudinary.secure_url,
         image: videoThumbnail || req.cloudinary.image.secure_url,
@@ -34,20 +58,6 @@ exports.createPost = async (req, res) => {
     return res.status(200).json({ status: "success", message: `New ${newPost.mediaType} post created.` });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ status: "fail", message: error.message });
-  }
-};
-
-// Get a single post
-exports.fetchSinglePost = async (req, res) => {
-  try {
-    let query = await Post.findById(req.params.id);
-
-    if (!query) return res.status(404).json({ status: "fail", message: `Post not found.` });
-
-    return res.status(200).json({ data: query });
-  } catch (err) {
-    console.log(err);
     res.status(500).json({ status: "fail", message: error.message });
   }
 };

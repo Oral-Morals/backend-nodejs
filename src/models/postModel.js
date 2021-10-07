@@ -8,10 +8,6 @@ const PostSchema = new mongoose.Schema(
       required: true,
       ref: "User",
     },
-    img: {
-      type: String,
-      default: null,
-    },
     likes: {
       type: Number,
       default: 0,
@@ -23,6 +19,10 @@ const PostSchema = new mongoose.Schema(
     caption: {
       type: String,
       max: 300,
+      required: true,
+    },
+    heritage: {
+      type: String,
       required: true,
     },
     mediaType: {

@@ -1,14 +1,13 @@
 // This file was created to accommodate multiple different file uploads from a single post request.
 
+// Object destructure to get properties and values from req.files to req.file
+// to be used with cloudinary's upload method.
 const transferObjectProperties = (originalObj) => {
   const { fieldname, originalname, encoding, mimetype, destination, filename, path, size } = originalObj;
   return { fieldname, originalname, encoding, mimetype, destination, filename, path, size };
 };
 
 exports.updateProperties = async (req, res, next) => {
-  // Object destructure to get properties and values from req.files to req.file
-  // to be used with cloudinary's upload method.
-
   try {
     //===========================================
     // Handles profile picture
@@ -33,9 +32,10 @@ exports.updateProperties = async (req, res, next) => {
     //===========================================
 
     if (req.path === "/posts/new-post") {
-      // Check if the post caption is present and return error if it is not.
-      if (!req.body.caption)
-        return res.status(400).json({ status: "fail", message: "The caption field must be filled out." });
+      // If there are no files uploaded, return an error response.
+      if (Object.keys(req.files).length === 0) {
+        return res.status(400).json({ status: "fail", message: "An audio or video file was NOT uploaded." });
+      }
 
       // Check if audio and video is uploaded at the same time and
       // return an error is both were in the same request.
@@ -45,12 +45,24 @@ exports.updateProperties = async (req, res, next) => {
           .json({ status: "fail", message: "Audio and video media types not allowed in the same request." });
       }
 
+      // Check if the post caption is present and return an error if it is not.
+      if (!req.body.caption)
+        return res.status(400).json({ status: "fail", message: "The caption field must be filled out." });
+
+      // If a video file was uploaded extract the object from req.files to req.file.
+      if (req.files.video) {
+        req.file = transferObjectProperties(req.files.video[0]);
+        return next();
+      }
+
+      // If a audio and image file was uploaded extract the object from req.files to req.file.
       if (req.files.audio && req.files.image) {
         req.file = transferObjectProperties(req.files.audio[0]);
         req.file.image = transferObjectProperties(req.files.image[0]);
+        return next();
       }
 
-      if (req.files.video) req.file = transferObjectProperties(req.files.video[0]);
+      return res.status(400).json({ status: "fail", message: "An audio or video file was NOT uploaded. " });
     }
   } catch (error) {
     console.log(error);

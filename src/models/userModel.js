@@ -44,13 +44,13 @@ const UserSchema = new mongoose.Schema(
       enum: ["curator", "admin", "user"],
       default: "user",
     },
-    heritage: {
-      type: Array,
-      default: [],
+    heritages: {
+      type: String,
+      default: null,
     },
-    language: {
-      type: Array,
-      default: [],
+    languages: {
+      type: String,
+      default: null,
     },
     bio: {
       type: String,

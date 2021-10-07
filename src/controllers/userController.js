@@ -45,7 +45,9 @@ exports.updateProfile = async (req, res) => {
     const { name, username, languages, heritages, bio } = req.body;
 
     // Get user data.
-    const user = await User.findOne({ _id: req.user.id });
+    const user = await User.findOne({ _id: req.user.id }).select(
+      "-password -dateOfBirth -role -isVerified -updatedAt -__v -profilePicture.cloudinaryPublicID"
+    );
 
     // Update name.
     user.name = name;
@@ -62,27 +64,29 @@ exports.updateProfile = async (req, res) => {
     await user.save();
 
     // Handle username.
-    if (user.username !== username) {
-      // Query the database for a username that matches the request body's username.
-      const newUsername = await User.findOne({ username });
+    if (username) {
+      if (user.username !== username) {
+        // Query the database for a username that matches the request body's username.
+        const newUsername = await User.findOne({ username });
 
-      // If that username already exists return a response
-      // with all current profile data and a 409 status code with a message
-      // saying the username is taken.
-      if (newUsername) {
-        return res.status(409).json({
-          status: "fail",
-          message: "Username is already taken. Any other data sent with this request has been updated.",
-        });
+        // If that username already exists return a response
+        // with all current profile data and a 409 status code with a message
+        // saying the username is taken.
+        if (newUsername) {
+          return res.status(409).json({
+            status: "fail",
+            message: "Username is already taken. Any other data sent with this request has been updated.",
+          });
+        }
+
+        // Set the user's username to the requested username and save.
+        user.username = username;
+
+        await user.save();
       }
-
-      // Set the user's username to the requested username and save.
-      user.username = username;
-
-      await user.save();
     }
 
-    return res.status(200).json({ status: "success", message: "Profile updated." });
+    return res.status(200).json({ status: "success", message: "Profile updated.", data: user });
   } catch (error) {
     console.log(error);
     res.status(500).json({ status: "fail", message: error.message });
