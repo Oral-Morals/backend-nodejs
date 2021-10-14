@@ -216,11 +216,12 @@ exports.login = async (req, res) => {
 exports.passwordResetRequest = async (req, res) => {
   try {
     let user = await User.findOne({ email: req.body.email });
-
+    // generate a random (e.g 6-digit) code and store it in reference to that user
+    const sixDigitCode = Math.floor(100000 + Math.random() * 900000);
     let token = await TokenModel.create({
       userID: user._id,
-      token: uuidv4(),
-      expiresIn: moment().add(1, "hours"),
+      token: sixDigitCode,
+      expiresIn: moment().add(5, "minutes"),
       tokenType: "password-reset",
     });
 
@@ -230,7 +231,7 @@ exports.passwordResetRequest = async (req, res) => {
     const html = `<p>Click <a href="reset-form-with-token>here</a> to reset your password.</p>`;
     // const deepLink = TODO:get deep link
 
-    //await sendMail({ to, subject, html });
+    await sendMail({ to, subject, html });
 
     return res
       .status(200)
@@ -272,7 +273,6 @@ exports.passwordReset = async (req, res) => {
     await token.save();
 
     const hashedPassword = await bcrypt.hash(req.body.password, parseInt(process.env.SALT));
-
     user.password = hashedPassword;
 
     await user.save();
