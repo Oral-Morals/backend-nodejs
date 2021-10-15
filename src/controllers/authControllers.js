@@ -154,16 +154,22 @@ exports.emailVerification = async (req, res) => {
 
 exports.resendEmailVerToken = async (req, res) => {
   try {
+    // Search for existing user by email
     let user = await User.findOne({ email: req.body.email });
 
+    // If user is not found send this message
     if (!user) return res.status(400).json({ message: "We were unable to find a user with that email." });
 
+    // If existing user is verified send this message
     if (user.isVerified) return res.status(403).json({ message: "This account is already verified. Please log in." });
+
+    // Create unique 6 digit code
+    const sixDigitCode = Math.floor(100000 + Math.random() * 900000);
 
     let newToken = await TokenModel.create({
       userID: user._id,
-      token: uuidv4(),
-      expiresIn: moment().add(1, "hours"),
+      token: sixDigitCode,
+      expiresIn: moment().add(5, "minutes"),
       tokenType: "email-verification",
     });
 
