@@ -82,10 +82,13 @@ exports.signup = async (req, res) => {
       password: hashedPassword,
     });
 
+    // Create unique 6 digit code
+    const sixDigitCode = Math.floor(100000 + Math.random() * 900000);
+
     //Create Token for new user
     let token = await TokenModel.create({
       userID: newUser._id,
-      token: uuidv4(),
+      token: sixDigitCode,
       expiresIn: moment().add(1, "hours"),
       tokenType: "email-verification",
     });
@@ -178,6 +181,7 @@ exports.resendEmailVerToken = async (req, res) => {
     const html = `<p>You're just one click away from getting started with Oral Morals. All you need to do is verify your email address to activate your Oral Morals account. Click <a href="http://localhost:${process.env.PORT}/verify/${newToken.token}">here</a></p>`;
 
     await sendMail(to, subject, html);
+    console.log(`This is the users email ==> ${to}`);
 
     res.status(200).json({ message: `A verification email has been sent to ${user.email}.` });
   } catch (err) {
