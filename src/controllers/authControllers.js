@@ -82,13 +82,10 @@ exports.signup = async (req, res) => {
       password: hashedPassword,
     });
 
-    // Create unique 6 digit code
-    const sixDigitCode = Math.floor(100000 + Math.random() * 900000);
-
     //Create Token for new user
     let token = await TokenModel.create({
       userID: newUser._id,
-      token: sixDigitCode,
+      token: uuidv4(),
       expiresIn: moment().add(1, "hours"),
       tokenType: "email-verification",
     });
@@ -157,32 +154,23 @@ exports.emailVerification = async (req, res) => {
 
 exports.resendEmailVerToken = async (req, res) => {
   try {
-    // Search for existing user by email
     let user = await User.findOne({ email: req.body.email });
 
-    // If user is not found send this message
     if (!user) return res.status(400).json({ message: "We were unable to find a user with that email." });
-
-    // If existing user is verified send this message
     if (user.isVerified) return res.status(403).json({ message: "This account is already verified. Please log in." });
-
-    // Create unique 6 digit code
-    const sixDigitCode = Math.floor(100000 + Math.random() * 900000);
 
     let newToken = await TokenModel.create({
       userID: user._id,
-      token: sixDigitCode,
-      expiresIn: moment().add(5, "minutes"),
+      token: uuidv4(),
+      expiresIn: moment().add(1, "hours"),
       tokenType: "email-verification",
     });
 
     const to = user.email;
     const subject = "Activate your Oral Moral's Account Now";
-    const html = `<p>You're just one click away from getting started with Oral Morals. All you need to do is verify your email address to activate your Oral Morals account. Click <a href="http://localhost:${process.env.PORT}/verify/${newToken.token}">here</a></p>`;
+    const html = `<p>You're just one click away from getting started with Oral Morals. All you need to do is verify your email address to activate your Oral Morals account. Click <a href="http://localhost:${process.env.PORT}/api/v1/auth/verify/${newToken.token}">here</a></p>`;
 
-    await sendMail(to, subject, html);
-    console.log(`This is the users email ==> ${to}`);
-
+    await sendMail({ to, subject, html });
     res.status(200).json({ message: `A verification email has been sent to ${user.email}.` });
   } catch (err) {
     console.log(err);
@@ -223,29 +211,50 @@ exports.login = async (req, res) => {
   }
 };
 
+exports.verifyOtp = async (req, res) => {
+  // Search for existing user
+  let user = await User.findOne({ email: req.body.email });
+  // Search for the token to verify
+  let token = await TokenModel.findOne({ userID: user._id, token: req.body.otp });
+
+  if (!token) {
+    return res.status(409).json({ message: "Please request another one time password" });
+  }
+
+  console.log(`This is the token ==> `);
+  console.log(token);
+  console.log(req.body.otp);
+  res.status(200).json(token);
+};
+
 exports.passwordResetRequest = async (req, res) => {
   try {
+    // Search for existing user by email
     let user = await User.findOne({ email: req.body.email });
-    // generate a random (e.g 6-digit) code and store it in reference to that user
+
+    // If user is not found send this message
+    if (!user) return res.status(400).json({ message: "We were unable to find a user with that email." });
+
+    // If existing user is verified send this message
+    if (user.isVerified) return res.status(403).json({ message: "This account is already verified. Please log in." });
+
+    // Create unique 6 digit code
     const sixDigitCode = Math.floor(100000 + Math.random() * 900000);
-    let token = await TokenModel.create({
+
+    let newToken = await TokenModel.create({
       userID: user._id,
       token: sixDigitCode,
       expiresIn: moment().add(5, "minutes"),
-      tokenType: "password-reset",
+      tokenType: "OTP",
     });
 
     const to = user.email;
-    const subject = "Forgot your password?";
-    //TODO: wait for design before any changes are made to this link
-    const html = `<p>Click <a href="reset-form-with-token>here</a> to reset your password.</p>`;
-    // const deepLink = TODO:get deep link
+    const subject = "Activate your Oral Moral's Account Now";
+    const html = `<p>Here is your one time password! Please use this code to verify: ${sixDigitCode}</p>`;
 
     await sendMail({ to, subject, html });
 
-    return res
-      .status(200)
-      .json({ message: `An email has been sent to ${user.email} with further instructions.`, token: token.token });
+    res.status(200).json({ message: `A verification email has been sent to ${user.email}.` });
   } catch (err) {
     console.log(err);
     if (err) return res.status(500).json({ message: "Something went wrong. Please try again later" });

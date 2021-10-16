@@ -12,6 +12,8 @@ router.post("/auth/login", Auth.login);
 
 router.post("/auth/resend", Auth.resendEmailVerToken);
 
+router.post("/auth/verify", Auth.verifyOtp);
+
 router.post("/auth/recover", Auth.passwordResetRequest);
 
 router.post("/auth/reset", Auth.passwordReset);
