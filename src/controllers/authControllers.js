@@ -212,19 +212,26 @@ exports.login = async (req, res) => {
 };
 
 exports.verifyOtp = async (req, res) => {
-  // Search for existing user
-  let user = await User.findOne({ email: req.body.email });
-  // Search for the token to verify
-  let token = await TokenModel.findOne({ userID: user._id, token: req.body.otp });
+  try {
+    // Search for existing user
+    let user = await User.findOne({ email: req.body.email });
+    // Search for the token to verify
+    let token = await TokenModel.findOne({ userID: user._id, token: req.body.otp });
 
-  if (!token) {
-    return res.status(409).json({ message: "Please request another one time password" });
+    // If the token is expired send this message
+    if (token.expired === true) {
+      return res.status(401).json({ message: "The token is expired, please request a new one." });
+    }
+    // If the token is incorrect, send this message
+    if (!token) {
+      return res.status(409).json({ message: "Please request a new one-time-password" });
+    }
+    // Return the token object
+    res.status(200).json(token);
+  } catch (err) {
+    console.log(err);
+    if (err) return res.status(500).json({ message: "Something went wrong. Please try again later" });
   }
-
-  console.log(`This is the token ==> `);
-  console.log(token);
-  console.log(req.body.otp);
-  res.status(200).json(token);
 };
 
 exports.passwordResetRequest = async (req, res) => {
