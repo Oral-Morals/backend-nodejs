@@ -31,13 +31,17 @@ const UserSchema = new mongoose.Schema(
       type: Object,
       default: {},
     },
-    followers: {
-      type: Array,
-      default: [],
+    postCount: {
+      type: Number,
+      default: 0
     },
-    following: {
-      type: Array,
-      default: [],
+    followerCount: {
+      type: Number,
+      default: 0,
+    },
+    followingCount: {
+      type: Number,
+      default: 0,
     },
     role: {
       type: String,
@@ -61,6 +65,10 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isActivated: {
+      type: Boolean,
+      default: true
+    }
   },
   { timestamps: true }
 );
