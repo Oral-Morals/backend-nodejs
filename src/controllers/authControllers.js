@@ -193,18 +193,27 @@ exports.login = async (req, res) => {
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(400).json({ message: "Incorrect Email or Password" });
 
-    const token = jwt.sign(
-      {
-        id: user._id,
-        email: user.email,
-        dateOfBirth: user.dateOfBirth,
-        username: user.username,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "24h" }
-    );
-    // If passwords match, log in the user
-    return res.status(200).json({ message: `${user.email} logged in successfully!`, token });
+    // acquire the verified status
+    const verifiedStatus = user.isVerified;
+
+    // check if status is true or false
+    if (verifiedStatus === false) {
+      // if false, don't allow user to log in
+      return res.status(400).json({ message: "Please check your email and verify your account." });
+    } else {
+      // if true, allow user to log in
+      const token = jwt.sign(
+        {
+          id: user._id,
+          email: user.email,
+          dateOfBirth: user.dateOfBirth,
+          username: user.username,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "24h" }
+      );
+      return res.status(200).json({ message: `${user.email} logged in successfully!`, token });
+    }
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, message: error.message });
@@ -242,9 +251,6 @@ exports.passwordResetRequest = async (req, res) => {
     // If user is not found send this message
     if (!user) return res.status(400).json({ message: "We were unable to find a user with that email." });
 
-    // If existing user is verified send this message
-    if (user.isVerified) return res.status(403).json({ message: "This account is already verified. Please log in." });
-
     // Create unique 6 digit code
     const sixDigitCode = Math.floor(100000 + Math.random() * 900000);
 
@@ -256,12 +262,12 @@ exports.passwordResetRequest = async (req, res) => {
     });
 
     const to = user.email;
-    const subject = "Activate your Oral Moral's Account Now";
-    const html = `<p>Here is your one time password! Please use this code to verify: ${sixDigitCode}</p>`;
+    const subject = "Forgot your password?";
+    const html = `<p>Here is your one time password! Please use this code to verify your account: ${sixDigitCode}</p>`;
 
     await sendMail({ to, subject, html });
 
-    res.status(200).json({ message: `A verification email has been sent to ${user.email}.` });
+    res.status(200).json({ message: `A email has been sent to ${user.email} with further instructions.` });
   } catch (err) {
     console.log(err);
     if (err) return res.status(500).json({ message: "Something went wrong. Please try again later" });

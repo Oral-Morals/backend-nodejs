@@ -33,7 +33,7 @@ exports.sendMail = async (mailOptions = {}) => {
       html: mailOptions.html,
     };
 
-    console.log({ mailOptions, mailData });
+    // console.log({ mailOptions, mailData });
 
     if (process.env.SEND_EMAILS === "true") {
       transporter.sendMail(mailData, (info) => {
