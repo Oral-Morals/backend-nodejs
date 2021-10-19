@@ -3,12 +3,12 @@ const mongoose = require("mongoose");
 const PostSchema = new mongoose.Schema(
   {
     userId: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "User",
     },
     likes: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Likes",
     },
     likesCount: {
@@ -16,7 +16,7 @@ const PostSchema = new mongoose.Schema(
       default: 0,
     },
     comments: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Comments",
     },
     caption: {
