@@ -1,23 +1,22 @@
 const mongoose = require("mongoose");
-const { Schema } = require("mongoose");
 
 const PostSchema = new mongoose.Schema(
   {
     userId: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "User",
     },
-    img: {
-      type: String,
-      default: null,
-    },
     likes: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Likes",
+    },
+    likesCount: {
       type: Number,
       default: 0,
     },
     comments: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Comments",
     },
     caption: {
@@ -32,6 +31,10 @@ const PostSchema = new mongoose.Schema(
     mediaLinks: {
       type: Object,
       required: true,
+    },
+    views: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true }
