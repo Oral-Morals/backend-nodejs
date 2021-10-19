@@ -263,11 +263,11 @@ exports.passwordResetRequest = async (req, res) => {
 
     const to = user.email;
     const subject = "Forgot your password?";
-    const html = `<p>Here is your one time password! Please use this code to verify: ${sixDigitCode}</p>`;
+    const html = `<p>Here is your one time password! Please use this code to verify your account: ${sixDigitCode}</p>`;
 
     await sendMail({ to, subject, html });
 
-    res.status(200).json({ message: `A verification email has been sent to ${user.email} with further instructions.` });
+    res.status(200).json({ message: `A email has been sent to ${user.email} with further instructions.` });
   } catch (err) {
     console.log(err);
     if (err) return res.status(500).json({ message: "Something went wrong. Please try again later" });
