@@ -193,20 +193,27 @@ exports.login = async (req, res) => {
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(400).json({ message: "Incorrect Email or Password" });
 
-    // Also, check if the account is verified
+    // acquire the verified status
+    const verifiedStatus = user.isVerified;
 
-    const token = jwt.sign(
-      {
-        id: user._id,
-        email: user.email,
-        dateOfBirth: user.dateOfBirth,
-        username: user.username,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "24h" }
-    );
-    // If passwords match, log in the user
-    return res.status(200).json({ message: `${user.email} logged in successfully!`, token });
+    // check if status is true or false
+    if (verifiedStatus === false) {
+      // if false, don't allow user to log in
+      return res.status(400).json({ message: "Please check your email and verify your account." });
+    } else {
+      // if true, allow user to log in
+      const token = jwt.sign(
+        {
+          id: user._id,
+          email: user.email,
+          dateOfBirth: user.dateOfBirth,
+          username: user.username,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "24h" }
+      );
+      return res.status(200).json({ message: `${user.email} logged in successfully!`, token });
+    }
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, message: error.message });
