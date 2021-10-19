@@ -1,23 +1,29 @@
-const mongoose = require('mongoose');
-const { Schema } = require("mongoose");
+const mongoose = require("mongoose");
 
-const CommentSchema = new mongoose.Schema({
-    username: {
+const CommentSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "User",
+    },
+    content: {
       type: String,
-      required:true
+      required: true,
     },
-    content:{
-      type:String,
-      required:true
+    post: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "Post",
     },
-    post:{
-      type:Schema.ObjectId,
-      ref:'Post'
+    likes: {
+      type: Schema.Types.ObjectId,
+      ref: "Likes",
     },
-    likes:{
-      type:Array,
-      default:[]
-    }
+    likesCount: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );
