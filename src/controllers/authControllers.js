@@ -157,7 +157,6 @@ exports.resendEmailVerToken = async (req, res) => {
     let user = await User.findOne({ email: req.body.email });
 
     if (!user) return res.status(400).json({ message: "We were unable to find a user with that email." });
-
     if (user.isVerified) return res.status(403).json({ message: "This account is already verified. Please log in." });
 
     let newToken = await TokenModel.create({
@@ -169,10 +168,9 @@ exports.resendEmailVerToken = async (req, res) => {
 
     const to = user.email;
     const subject = "Activate your Oral Moral's Account Now";
-    const html = `<p>You're just one click away from getting started with Oral Morals. All you need to do is verify your email address to activate your Oral Morals account. Click <a href="http://localhost:${process.env.PORT}/verify/${newToken.token}">here</a></p>`;
+    const html = `<p>You're just one click away from getting started with Oral Morals. All you need to do is verify your email address to activate your Oral Morals account. Click <a href="http://localhost:${process.env.PORT}/api/v1/auth/verify/${newToken.token}">here</a></p>`;
 
-    await sendMail(to, subject, html);
-
+    await sendMail({ to, subject, html });
     res.status(200).json({ message: `A verification email has been sent to ${user.email}.` });
   } catch (err) {
     console.log(err);
@@ -213,29 +211,57 @@ exports.login = async (req, res) => {
   }
 };
 
+exports.verifyOtp = async (req, res) => {
+  try {
+    // Search for existing user
+    let user = await User.findOne({ email: req.body.email });
+    // Search for the token to verify
+    let token = await TokenModel.findOne({ userID: user._id, token: req.body.otp });
+
+    // If the token is expired send this message
+    if (token.expired === true) {
+      return res.status(401).json({ message: "The token is expired, please request a new one." });
+    }
+    // If the token is incorrect, send this message
+    if (!token) {
+      return res.status(409).json({ message: "Please request a new one-time-password" });
+    }
+    // Return the token object
+    res.status(200).json(token);
+  } catch (err) {
+    console.log(err);
+    if (err) return res.status(500).json({ message: "Something went wrong. Please try again later" });
+  }
+};
+
 exports.passwordResetRequest = async (req, res) => {
   try {
+    // Search for existing user by email
     let user = await User.findOne({ email: req.body.email });
-    // generate a random (e.g 6-digit) code and store it in reference to that user
+
+    // If user is not found send this message
+    if (!user) return res.status(400).json({ message: "We were unable to find a user with that email." });
+
+    // If existing user is verified send this message
+    if (user.isVerified) return res.status(403).json({ message: "This account is already verified. Please log in." });
+
+    // Create unique 6 digit code
     const sixDigitCode = Math.floor(100000 + Math.random() * 900000);
-    let token = await TokenModel.create({
+
+    let newToken = await TokenModel.create({
       userID: user._id,
       token: sixDigitCode,
       expiresIn: moment().add(5, "minutes"),
-      tokenType: "password-reset",
+      tokenType: "OTP",
     });
 
     const to = user.email;
-    const subject = "Forgot your password?";
-    //TODO: wait for design before any changes are made to this link
-    const html = `<p>Click <a href="reset-form-with-token>here</a> to reset your password.</p>`;
-    // const deepLink = TODO:get deep link
+    const subject = "Activate your Oral Moral's Account Now";
+    const html = `<p>Here is your one time password! Please use this code to verify: ${sixDigitCode}</p>`;
 
     await sendMail({ to, subject, html });
 
-    return res
-      .status(200)
-      .json({ message: `An email has been sent to ${user.email} with further instructions.`, token: token.token });
+    res.status(200).json({ message: `A verification email has been sent to ${user.email}.` });
   } catch (err) {
     console.log(err);
     if (err) return res.status(500).json({ message: "Something went wrong. Please try again later" });

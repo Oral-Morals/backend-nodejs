@@ -29,11 +29,11 @@ exports.sendMail = async (mailOptions = {}) => {
       html: mailOptions.html,
     };
 
-    // console.log({ mailOptions, mailData });
+    console.log({ mailOptions, mailData });
 
-    // await transporter.sendMail(mailData, (info) => {
-    //   console.log({ message: "Mail sent", message_id: info.message });
-    // });
+    await transporter.sendMail(mailData, (info) => {
+      console.log({ message: "Mail sent", message_id: info.message });
+    });
   } catch (error) {
     console.log(error);
   }
