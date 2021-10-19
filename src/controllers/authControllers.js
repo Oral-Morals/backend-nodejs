@@ -251,9 +251,6 @@ exports.passwordResetRequest = async (req, res) => {
     // If user is not found send this message
     if (!user) return res.status(400).json({ message: "We were unable to find a user with that email." });
 
-    // If existing user is verified send this message
-    if (user.isVerified) return res.status(403).json({ message: "This account is already verified. Please log in." });
-
     // Create unique 6 digit code
     const sixDigitCode = Math.floor(100000 + Math.random() * 900000);
 
@@ -265,12 +262,12 @@ exports.passwordResetRequest = async (req, res) => {
     });
 
     const to = user.email;
-    const subject = "Activate your Oral Moral's Account Now";
+    const subject = "Forgot your password?";
     const html = `<p>Here is your one time password! Please use this code to verify: ${sixDigitCode}</p>`;
 
     await sendMail({ to, subject, html });
 
-    res.status(200).json({ message: `A verification email has been sent to ${user.email}.` });
+    res.status(200).json({ message: `A verification email has been sent to ${user.email} with further instructions.` });
   } catch (err) {
     console.log(err);
     if (err) return res.status(500).json({ message: "Something went wrong. Please try again later" });
