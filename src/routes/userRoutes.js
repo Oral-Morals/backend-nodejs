@@ -17,6 +17,6 @@ router.patch(
   userController.updateProfile
 );
 
-router.patch("/users/profile/deactivate", authController.authorizeUser, userController.deactivate);
+router.patch("/users/profile/status", authController.authorizeUser, userController.accountStatus);
 
 module.exports = router;

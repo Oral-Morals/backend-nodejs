@@ -94,32 +94,43 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-// Deactivate account.
-exports.deactivate = async (req, res) => {
+// Account status (Deactivate/Reactivate).
+exports.accountStatus = async (req, res) => {
   try {
     // Check if field has a value.
     if (!req.body.isActivated) {
       return res.status(400).json({
         status: "fail",
-        message: `The "isActivated" property does not have a value. The value should be false.`,
+        message: `The isActivated property does not have a value. The value should be false to deactivate the account or true to reactivate the account.`,
       });
     }
 
-    if (req.body.isActivated === true) {
-      return res.status(400).json({
-        status: "fail",
-        message: `This endpoint is only for account deactivations.`,
-      });
-    }
     // Get user data.
     const user = await User.findOne({ _id: req.user.id });
 
-    // Update is isActivated to false.
-    user.isActivated = false;
+    let messageStatus = null;
+
+    // Deactivate user if "isActivated" is set to "false".
+    if (req.body.isActivated === "false") {
+      // Update is isActivated to false.
+      user.isActivated = false;
+
+      messageStatus = "deactivated";
+    }
+
+    // Reactivate user if "isActivated" is set to "true".
+    if (req.body.isActivated === "true") {
+      // Update is isActivated to true.
+      user.isActivated = true;
+
+      messageStatus = "reactivated";
+    }
 
     await user.save();
 
-    return res.status(200).json({ status: "success", message: `The account associated with ${user.email}` });
+    return res
+      .status(200)
+      .json({ status: "success", message: `The account associated with ${user.email} has been ${messageStatus}.` });
   } catch (error) {
     console.log(error);
     res.status(500).json({ status: "fail", message: error.message });
