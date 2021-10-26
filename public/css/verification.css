@@ -1,0 +1,20 @@
+p {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1.5em;
+  text-align: center;
+  color: #42536e;
+}
+
+img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}
+
+@media only screen and (min-width: 768px) {
+  /* For desktop: */
+  img {
+    width: 35%;
+  }
+}
