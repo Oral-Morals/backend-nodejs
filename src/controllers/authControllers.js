@@ -5,6 +5,7 @@ const moment = require("moment");
 const { TokenModel } = require("../models/tokenModel");
 const { v4: uuidv4 } = require("uuid");
 const { sendMail } = require("../services/emailService");
+const path = require("path");
 moment().format();
 
 exports.authorizeAge = async (req, res, next) => {
@@ -145,7 +146,7 @@ exports.emailVerification = async (req, res) => {
     //Update these properties in the token model
     await TokenModel.updateMany({ userID: user._id }, { expired: true });
 
-    return res.status(200).json({ message: "Your account has been verified! Please log in." });
+    return res.status(200).sendFile(path.join(__dirname, "../views/verification.html"));
   } catch (err) {
     console.log(err);
     if (err) return res.status(500).json({ success: false, message: err.message });
